@@ -1,0 +1,17 @@
+{
+  "name":         "private-dev/utils",
+  "description":  "Set of useful code",
+  "type":         "utils",
+  "license":      "proprietary",
+  "autoload": {
+    "psr-4": { "PrivateDev\\Utils\\": "" }
+  },
+  "config": {
+    "platform": {
+      "php": "5.5.9"
+    }
+  },
+  "require": {
+    "league/fractal": "0.13.0"
+  }
+}
