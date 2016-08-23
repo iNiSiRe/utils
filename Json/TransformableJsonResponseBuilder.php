@@ -5,6 +5,8 @@ namespace PrivateDev\Utils\Json;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
 use League\Fractal\Resource\ResourceInterface;
+use PrivateDev\Utils\Fractal\TransformerAbstract;
+use PrivateDev\Utils\Fractal\TransformerInterface;
 
 class TransformableJsonResponseBuilder extends JsonResponseBuilder
 {
@@ -30,7 +32,7 @@ class TransformableJsonResponseBuilder extends JsonResponseBuilder
      *
      * @return TransformableJsonResponseBuilder
      */
-    public function setTranformableItem($object, $transformer)
+    public function setTranformableItem($object, TransformerAbstract $transformer)
     {
         return $this->setTransformableResource(new Item($object, $transformer));
     }
@@ -41,7 +43,7 @@ class TransformableJsonResponseBuilder extends JsonResponseBuilder
      *
      * @return TransformableJsonResponseBuilder
      */
-    public function setTransformableCollection($collection, $transformer)
+    public function setTransformableCollection($collection, TransformerAbstract $transformer)
     {
         return $this->setTransformableResource(new Collection($collection, $transformer));
     }
