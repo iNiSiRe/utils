@@ -3,8 +3,10 @@
 namespace PrivateDev\Utils\Controller;
 
 use Doctrine\ORM\EntityRepository;
-use PageBundle\ErrorCodes;
+use PrivateDev\Utils\Error\ErrorCodes;
 use PrivateDev\Utils\Form\FormErrorAdapter;
+use PrivateDev\Utils\Fractal\TransformerAbstract;
+use PrivateDev\Utils\Json\TransformableJsonResponseBuilder;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -23,15 +25,6 @@ abstract class CRUDController extends Controller
     const ACTION_DELETE = 4;
 
     /**
-     * Roles for actions
-     *
-     * Note: Null role means no restrictions
-     *
-     * @var array
-     */
-    protected static $roles = [];
-
-    /**
      * Get repository of the Entity
      *
      * @return EntityRepository
@@ -42,15 +35,16 @@ abstract class CRUDController extends Controller
      * Create Form for the Entity
      *
      * @param object $entity
+     * @param array  $options
      *
      * @return FormInterface
      */
-    abstract protected function createEntityForm($entity) : FormInterface;
+    abstract protected function createEntityForm($entity, array $options = []) : FormInterface;
 
     /**
      * Create transformer for the Entity
      *
-     * @return object
+     * @return TransformerAbstract
      */
     abstract protected function createEntityTransformer();
 
@@ -62,14 +56,39 @@ abstract class CRUDController extends Controller
     abstract protected function createEntity();
 
     /**
+     * @return TransformableJsonResponseBuilder
+     */
+    abstract protected function getResponseBuilder();
+
+    /**
+     * Roles for actions
+     *
+     * Note: null - no restrictions
+     *       true - action restricted
+     *
+     * @return array
+     */
+    protected function getRoles()
+    {
+        return [
+            self::ACTION_CREATE => null,
+            self::ACTION_READ   => null,
+            self::ACTION_UPDATE => null,
+            self::ACTION_DELETE => null
+        ];
+    }
+
+    /**
      * @param int $action
      *
      * @return string|null
      */
     protected function getAccessRole(int $action)
     {
-        return isset($this::$roles[$action])
-            ? $this::$roles[$action]
+        $roles = $this->getRoles();
+
+        return isset($roles[$action])
+            ? $roles[$action]
             : null;
     }
 
@@ -81,9 +100,9 @@ abstract class CRUDController extends Controller
      */
     protected function doUpdate($entity, Request $request)
     {
-        $responseBuilder = $this->get('json_response_builder');
+        $responseBuilder = $this->getResponseBuilder();
 
-        $form = $this->createEntityForm($entity);
+        $form = $this->createEntityForm($entity, ['method' => $request->getMethod()]);
         $form->handleRequest($request);
 
         if ($form->isValid()) {
@@ -100,6 +119,15 @@ abstract class CRUDController extends Controller
         }
 
         return $response;
+    }
+
+    /**
+     * @param int    $action
+     * @param object $entity
+     */
+    protected function postEntityLoadCheckAccess($action, $entity)
+    {
+        // By default do nothing, but you can override it
     }
 
     /**
@@ -124,6 +152,18 @@ abstract class CRUDController extends Controller
     }
 
     /**
+     * @param $entity
+     *
+     * @return JsonResponse
+     */
+    protected function doRead($entity)
+    {
+        return $this->getResponseBuilder()
+            ->setTranformableItem($entity, $this->createEntityTransformer())
+            ->build();
+    }
+
+    /**
      * @Route(path="/{id}")
      * @Method({"GET"})
      *
@@ -133,15 +173,21 @@ abstract class CRUDController extends Controller
      */
     public function readAction($id)
     {
+        $role = $this->getAccessRole(self::ACTION_READ);
+
+        if ($role && !$this->isGranted($role)) {
+            throw new AccessDeniedHttpException();
+        }
+
         $entity = $this->getEntityRepository()->find($id);
 
         if (!$entity) {
             throw new NotFoundHttpException();
         }
 
-        return $this->get('json_response_builder')
-            ->setTranformableItem($entity, $this->createEntityTransformer())
-            ->build();
+        $this->postEntityLoadCheckAccess(self::ACTION_READ, $entity);
+
+        return $this->doRead($entity);
     }
 
     /**
@@ -167,7 +213,25 @@ abstract class CRUDController extends Controller
             throw new NotFoundHttpException();
         }
 
+        $this->postEntityLoadCheckAccess(self::ACTION_UPDATE, $entity);
+
         return $this->doUpdate($entity, $request);
+    }
+
+    /**
+     * @param $entity
+     *
+     * @return JsonResponse
+     */
+    protected function doDelete($entity)
+    {
+        $em = $this->get('doctrine.orm.entity_manager');
+        $em->remove($entity);
+        $em->flush($entity);
+
+        return $this
+            ->getResponseBuilder()
+            ->build();
     }
 
     /**
@@ -192,12 +256,8 @@ abstract class CRUDController extends Controller
             throw new NotFoundHttpException();
         }
 
-        $em = $this->get('doctrine.orm.entity_manager');
-        $em->remove($entity);
-        $em->flush($entity);
+        $this->postEntityLoadCheckAccess(self::ACTION_DELETE, $entity);
 
-        return $this
-            ->get('json_response_builder')
-            ->build();
+        return $this->doDelete($entity);
     }
 }
