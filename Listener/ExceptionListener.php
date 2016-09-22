@@ -26,19 +26,25 @@ class ExceptionListener
      * @var JsonResponseBuilder
      */
     private $responseBuilder;
+    /**
+     * @var string
+     */
+    private $serviceName;
 
     /**
      * ExceptionListener constructor.
      *
-     * @param string              $env
-     * @param LoggerInterface     $logger
+     * @param string $env
+     * @param LoggerInterface $logger
      * @param JsonResponseBuilder $responseBuilder
+     * @param string $serviceName
      */
-    public function __construct(string $env, LoggerInterface $logger, JsonResponseBuilder $responseBuilder)
+    public function __construct(string $env, LoggerInterface $logger, JsonResponseBuilder $responseBuilder, $serviceName = "")
     {
         $this->env = $env;
         $this->logger = $logger;
         $this->responseBuilder = $responseBuilder;
+        $this->serviceName = $serviceName;
     }
 
     /**
@@ -88,10 +94,15 @@ class ExceptionListener
             return;
         }
 
+        $extraData = ['exception' => $exception];
+        if ($this->serviceName) {
+            $extraData['service_name'] = $this->serviceName;
+        }
+
         if (!$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500) {
-            $this->logger->critical($message, ['exception' => $exception]);
+            $this->logger->critical($message, $extraData);
         } else {
-            $this->logger->error($message, ['exception' => $exception]);
+            $this->logger->error($message, $extraData);
         }
     }
 }
