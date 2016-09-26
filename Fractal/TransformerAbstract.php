@@ -11,20 +11,42 @@ abstract class TransformerAbstract extends BaseTransformerAbstract
      *
      * @return array
      */
-    public function transform($object)
-    {
-        return [$this->getName() => $this->doTransform($object)];
-    }
-
-    /**
-     * @param object $object
-     *
-     * @return array
-     */
-    abstract protected function doTransform($object) : array;
+    abstract public function transform($object) : array;
 
     /**
      * @return string
      */
-    abstract protected function getName() : string;
+    abstract public function getResourceKey() : string;
+
+    /**
+     * @param mixed               $data
+     * @param TransformerAbstract $transformer
+     * @param string              $resourceKey
+     *
+     * @return \League\Fractal\Resource\Item
+     */
+    protected function item($data, $transformer, $resourceKey = null)
+    {
+        $resourceKey = $resourceKey === null
+            ? $transformer->getResourceKey()
+            : $resourceKey;
+
+        return parent::item($data, $transformer, $resourceKey);
+    }
+
+    /**
+     * @param mixed               $data
+     * @param TransformerAbstract $transformer
+     * @param null                $resourceKey
+     *
+     * @return \League\Fractal\Resource\Collection
+     */
+    protected function collection($data, $transformer, $resourceKey = null)
+    {
+        $resourceKey = $resourceKey === null
+            ? $transformer->getResourceKey()
+            : $resourceKey;
+
+        return parent::collection($data, $transformer, $resourceKey);
+    }
 }

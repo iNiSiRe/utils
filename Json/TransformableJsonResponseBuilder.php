@@ -6,7 +6,6 @@ use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
 use League\Fractal\Resource\ResourceInterface;
 use PrivateDev\Utils\Fractal\TransformerAbstract;
-use PrivateDev\Utils\Fractal\TransformerInterface;
 
 class TransformableJsonResponseBuilder extends JsonResponseBuilder
 {
@@ -23,6 +22,10 @@ class TransformableJsonResponseBuilder extends JsonResponseBuilder
 
         $this->setData('data', $transformed['data']);
 
+        if (isset($transformed['included'])) {
+            $this->setData('included', $transformed['included']);
+        }
+
         return $this;
     }
 
@@ -34,7 +37,7 @@ class TransformableJsonResponseBuilder extends JsonResponseBuilder
      */
     public function setTranformableItem($object, TransformerAbstract $transformer)
     {
-        return $this->setTransformableResource(new Item($object, $transformer));
+        return $this->setTransformableResource(new Item($object, $transformer, $transformer->getResourceKey()));
     }
 
     /**
@@ -45,6 +48,6 @@ class TransformableJsonResponseBuilder extends JsonResponseBuilder
      */
     public function setTransformableCollection($collection, TransformerAbstract $transformer)
     {
-        return $this->setTransformableResource(new Collection($collection, $transformer));
+        return $this->setTransformableResource(new Collection($collection, $transformer, $transformer->getResourceKey()));
     }
 }

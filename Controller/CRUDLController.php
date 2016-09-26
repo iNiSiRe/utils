@@ -47,6 +47,11 @@ abstract class CRUDLController extends CRUDController
     protected function buildFilterQuery(QueryBuilder $builder, string $alias, array $filter)
     {
         foreach ($filter as $key => $value) {
+
+            if ($value === null) {
+                continue;
+            }
+
             $builder->andWhere("{$alias}.{$key} = :{$key}_value")
                 ->setParameter("{$key}_value", $value);
         }
