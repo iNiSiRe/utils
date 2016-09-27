@@ -100,7 +100,7 @@ abstract class CRUDController extends Controller
      */
     protected function doUpdate($entity, Request $request)
     {
-        $this->postEntityLoadCheckAccess(self::ACTION_READ, $entity);
+        $this->postEntityLoadCheckAccess(self::ACTION_UPDATE, $entity);
 
         $responseBuilder = $this->getResponseBuilder();
 
@@ -225,7 +225,7 @@ abstract class CRUDController extends Controller
      */
     protected function doDelete($entity)
     {
-        $this->postEntityLoadCheckAccess(self::ACTION_READ, $entity);
+        $this->postEntityLoadCheckAccess(self::ACTION_DELETE, $entity);
 
         $em = $this->get('doctrine.orm.entity_manager');
         $em->remove($entity);
