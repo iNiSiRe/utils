@@ -100,6 +100,8 @@ abstract class CRUDController extends Controller
      */
     protected function doUpdate($entity, Request $request)
     {
+        $this->postEntityLoadCheckAccess(self::ACTION_READ, $entity);
+
         $responseBuilder = $this->getResponseBuilder();
 
         $form = $this->createEntityForm($entity, ['method' => $request->getMethod()]);
@@ -158,6 +160,8 @@ abstract class CRUDController extends Controller
      */
     protected function doRead($entity)
     {
+        $this->postEntityLoadCheckAccess(self::ACTION_READ, $entity);
+
         return $this->getResponseBuilder()
             ->setTranformableItem($entity, $this->createEntityTransformer())
             ->build();
@@ -185,8 +189,6 @@ abstract class CRUDController extends Controller
             throw new NotFoundHttpException();
         }
 
-        $this->postEntityLoadCheckAccess(self::ACTION_READ, $entity);
-
         return $this->doRead($entity);
     }
 
@@ -213,8 +215,6 @@ abstract class CRUDController extends Controller
             throw new NotFoundHttpException();
         }
 
-        $this->postEntityLoadCheckAccess(self::ACTION_UPDATE, $entity);
-
         return $this->doUpdate($entity, $request);
     }
 
@@ -225,6 +225,8 @@ abstract class CRUDController extends Controller
      */
     protected function doDelete($entity)
     {
+        $this->postEntityLoadCheckAccess(self::ACTION_READ, $entity);
+
         $em = $this->get('doctrine.orm.entity_manager');
         $em->remove($entity);
         $em->flush($entity);
@@ -255,8 +257,6 @@ abstract class CRUDController extends Controller
         if (!$entity) {
             throw new NotFoundHttpException();
         }
-
-        $this->postEntityLoadCheckAccess(self::ACTION_DELETE, $entity);
 
         return $this->doDelete($entity);
     }
