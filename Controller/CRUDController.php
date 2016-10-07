@@ -7,6 +7,7 @@ use PrivateDev\Utils\Error\ErrorCodes;
 use PrivateDev\Utils\Form\FormErrorAdapter;
 use PrivateDev\Utils\Fractal\TransformerAbstract;
 use PrivateDev\Utils\Json\TransformableJsonResponseBuilder;
+use PrivateDev\Utils\Permission\Permissions;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -71,10 +72,10 @@ abstract class CRUDController extends Controller
     protected function getRoles()
     {
         return [
-            self::ACTION_CREATE => null,
-            self::ACTION_READ   => null,
-            self::ACTION_UPDATE => null,
-            self::ACTION_DELETE => null
+            self::ACTION_CREATE => Permissions::EMPTY,
+            self::ACTION_READ   => Permissions::EMPTY,
+            self::ACTION_UPDATE => Permissions::EMPTY,
+            self::ACTION_DELETE => Permissions::EMPTY
         ];
     }
 
