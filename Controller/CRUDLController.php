@@ -4,6 +4,8 @@ namespace PrivateDev\Utils\Controller;
 
 use Doctrine\ORM\QueryBuilder;
 use PrivateDev\Utils\Error\ErrorCodes;
+use PrivateDev\Utils\Filter\FilterInterface;
+use PrivateDev\Utils\Filter\Query\FilterQueryComposer;
 use PrivateDev\Utils\Form\FormErrorAdapter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -31,46 +33,25 @@ abstract class CRUDLController extends CRUDController
         ]);
     }
 
-    /**
-     * @return int
-     */
-    protected function getCollectionMaxSize() : int
-    {
-        return 100;
-    }
-
-    /**
-     * @param QueryBuilder $builder
-     * @param string       $alias
-     * @param array        $filter
-     */
-    protected function buildFilterQuery(QueryBuilder $builder, string $alias, array $filter)
-    {
-        foreach ($filter as $key => $value) {
-
-            if ($value === null) {
-                continue;
-            }
-
-            $builder->andWhere("{$alias}.{$key} = :{$key}_value")
-                ->setParameter("{$key}_value", $value);
-        }
-
-        $builder->setMaxResults($this->getCollectionMaxSize());
-    }
-
     const QUERY_BUILDER_ALIAS = 'e';
 
     /**
-     * @param array $filter
+     * @return FilterQueryComposer
+     */
+    protected function getFilterQueryComposer()
+    {
+        return new FilterQueryComposer();
+    }
+
+    /**
+     * @param FilterInterface $filter
      *
      * @return array
      */
-    protected function findByFilter(array $filter)
+    protected function findByFilter(FilterInterface $filter)
     {
         $builder = $this->getEntityRepository()->createQueryBuilder(self::QUERY_BUILDER_ALIAS);
-
-        $this->buildFilterQuery($builder, self::QUERY_BUILDER_ALIAS, $filter);
+        $this->getFilterQueryComposer()->compose($builder, self::QUERY_BUILDER_ALIAS, $filter);
 
         return $builder->getQuery()->getResult();
     }
@@ -91,23 +72,20 @@ abstract class CRUDLController extends CRUDController
             throw new AccessDeniedHttpException();
         }
 
-        $filter = $this->createFilterForm();
-        $filter->handleRequest($request);
+        $form = $this->createFilterForm();
+        $form->handleRequest($request);
 
-        if ($filter->isValid() || !$filter->isSubmitted()) {
+        if ($form->isValid() || !$form->isSubmitted()) {
 
-            $filterData = $filter->isSubmitted()
-                ? $filter->getData()
-                : [];
-
-            $entities = $this->findByFilter($filterData);
+            $filter = $form->getData();
+            $entities = $this->findByFilter($filter);
 
             $response = $this->getResponseBuilder()
                 ->setTransformableCollection($entities, $this->createEntityTransformer())
                 ->build();
         } else {
             $response = $this->getResponseBuilder()
-                ->addErrorList(new FormErrorAdapter($filter->getErrors(true), ErrorCodes::VALIDATION_ERROR))
+                ->addErrorList(new FormErrorAdapter($form->getErrors(true), ErrorCodes::VALIDATION_ERROR))
                 ->build(JsonResponse::HTTP_BAD_REQUEST);
         }
 
