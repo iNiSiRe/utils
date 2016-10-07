@@ -3,6 +3,7 @@
 namespace PrivateDev\Utils\Form;
 
 use PrivateDev\Utils\Error\Error;
+use PrivateDev\Utils\Error\ErrorCodes;
 use PrivateDev\Utils\Error\ErrorList;
 use PrivateDev\Utils\Error\ErrorListInterface;
 use Symfony\Component\Form\FormErrorIterator;
@@ -35,7 +36,7 @@ class FormErrorAdapter extends ErrorList implements ErrorListInterface
      * @param FormErrorIterator $errorIterator
      * @param int               $validationErrorCode
      */
-    public function __construct(FormErrorIterator $errorIterator, $validationErrorCode = 0)
+    public function __construct(FormErrorIterator $errorIterator, $validationErrorCode = ErrorCodes::VALIDATION_ERROR)
     {
         for ($i = 0; $i < $errorIterator->count(); $i++) {
             $error = $errorIterator->offsetGet($i);
