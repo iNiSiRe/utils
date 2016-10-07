@@ -5,12 +5,12 @@ namespace PrivateDev\Utils\Filter;
 /**
  * Simple Filter with fields which are visible properties of class
  */
-class AbstractFilter implements FilterInterface
+abstract class AbstractFilter implements FilterInterface
 {
     /**
      * @return int
      */
-    protected function getCollectionMaxSize() : int
+    public function getCollectionMaxSize() : int
     {
         return 100;
     }
