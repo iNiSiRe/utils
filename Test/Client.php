@@ -20,8 +20,8 @@ class Client
     /**
      * Client constructor.
      *
-     * @param Client $client
-     * @param string $baseUrl
+     * @param TestClient $client
+     * @param string     $baseUrl
      */
     public function __construct(TestClient $client, $baseUrl = '/')
     {
@@ -41,7 +41,7 @@ class Client
         } else {
             $headers = [];
         }
-        
+
         $this->client->request(
             $request->getMethod(),
             $this->baseUrl . $request->getUrl(),
@@ -54,7 +54,8 @@ class Client
 
         return [
             json_decode($response->getContent(), true),
-            $response->getStatusCode()
+            $response->getStatusCode(),
+            $response->headers->all()
         ];
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace PrivateDev\Utils\Filter;
+namespace PrivateDev\Utils\Filter\Model;
 
 /**
  * Simple Filter with fields which are visible properties of class

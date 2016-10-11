@@ -2,11 +2,13 @@
 
 namespace PrivateDev\Utils\Controller;
 
-use Doctrine\ORM\QueryBuilder;
 use PrivateDev\Utils\Error\ErrorCodes;
-use PrivateDev\Utils\Filter\FilterInterface;
-use PrivateDev\Utils\Filter\Query\FilterQueryComposer;
+use PrivateDev\Utils\Filter as Filter;
+use PrivateDev\Utils\Filter\Form\PaginationForm;
+use PrivateDev\Utils\Filter\Model\FilterInterface;
+use PrivateDev\Utils\Filter\Model\Pagination;
 use PrivateDev\Utils\Form\FormErrorAdapter;
+use PrivateDev\Utils\Permission\Permissions;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\Form\FormInterface;
@@ -17,11 +19,27 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 abstract class CRUDLController extends CRUDController
 {
     const ACTION_LIST = 5;
+    const PAGINATION_TOTAL_SIZE = 'X-Pagination-Size';
 
     /**
+     * @param FilterInterface $filter
+     *
      * @return FormInterface
      */
-    abstract protected function createFilterForm();
+    abstract protected function createFilterForm(FilterInterface $filter);
+
+    /**
+     * @return FilterInterface
+     */
+    abstract protected function createFilter();
+
+    /**
+     * @return Pagination
+     */
+    protected function createPagination()
+    {
+        return new Pagination();
+    }
 
     /**
      * @return array
@@ -29,31 +47,60 @@ abstract class CRUDLController extends CRUDController
     protected function getRoles()
     {
         return array_merge(parent::getRoles(), [
-            self::ACTION_LIST => null
+            self::ACTION_LIST => Permissions::EMPTY
         ]);
     }
 
     const QUERY_BUILDER_ALIAS = 'e';
 
     /**
-     * @return FilterQueryComposer
+     * @return Filter\QueryBuilder
      */
-    protected function getFilterQueryComposer()
+    protected function getFilterQueryBuilder()
     {
-        return new FilterQueryComposer();
+        return new Filter\QueryBuilder($this->getEntityRepository());
     }
 
     /**
+     * @param Request         $request
      * @param FilterInterface $filter
+     * @param Pagination      $pagination
      *
-     * @return array
+     * @return JsonResponse
      */
-    protected function findByFilter(FilterInterface $filter)
+    protected function doList(Request $request, FilterInterface $filter, Pagination $pagination)
     {
-        $builder = $this->getEntityRepository()->createQueryBuilder(self::QUERY_BUILDER_ALIAS);
-        $this->getFilterQueryComposer()->compose($builder, self::QUERY_BUILDER_ALIAS, $filter);
+        $filterForm = $this->createFilterForm($filter);
+        $paginationForm = $this->createForm(PaginationForm::class, $pagination);
 
-        return $builder->getQuery()->getResult();
+        $filterForm->handleRequest($request);
+        $paginationForm->handleRequest($request);
+
+        if (
+            ($filterForm->isValid() || !$filterForm->isSubmitted())
+            && ($paginationForm->isValid() || !$paginationForm->isSubmitted())
+        ) {
+            $builder = $this->getFilterQueryBuilder()
+                ->setFilter($filterForm->getData())
+                ->setPagination($paginationForm->getData());
+
+            $entities = $builder->getQuery()->getResult();
+
+            $responseBuilder = $this->getResponseBuilder()
+                ->setTransformableCollection($entities, $this->createEntityTransformer());
+
+            if ($this->isResponseIncludePagination()) {
+                $responseBuilder->setHeader(self::PAGINATION_TOTAL_SIZE, $builder->getTotalSize());
+            }
+
+            $response = $responseBuilder->build();
+        } else {
+            $response = $this->getResponseBuilder()
+                ->addErrorList(new FormErrorAdapter($filterForm->getErrors(true), ErrorCodes::VALIDATION_ERROR))
+                ->build(JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        return $response;
     }
 
     /**
@@ -72,23 +119,14 @@ abstract class CRUDLController extends CRUDController
             throw new AccessDeniedHttpException();
         }
 
-        $form = $this->createFilterForm();
-        $form->handleRequest($request);
+        return $this->doList($request, $this->createFilter(), $this->createPagination());
+    }
 
-        if ($form->isValid() || !$form->isSubmitted()) {
-
-            $filter = $form->getData();
-            $entities = $this->findByFilter($filter);
-
-            $response = $this->getResponseBuilder()
-                ->setTransformableCollection($entities, $this->createEntityTransformer())
-                ->build();
-        } else {
-            $response = $this->getResponseBuilder()
-                ->addErrorList(new FormErrorAdapter($form->getErrors(true), ErrorCodes::VALIDATION_ERROR))
-                ->build(JsonResponse::HTTP_BAD_REQUEST);
-        }
-
-        return $response;
+    /**
+     * @return boolean
+     */
+    protected function isResponseIncludePagination()
+    {
+        return false;
     }
 }

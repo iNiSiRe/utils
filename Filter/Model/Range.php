@@ -2,8 +2,6 @@
 
 namespace PrivateDev\Utils\Filter\Model;
 
-use PrivateDev\Utils\Filter\AbstractFilter;
-
 class Range extends AbstractFilter
 {
     /**

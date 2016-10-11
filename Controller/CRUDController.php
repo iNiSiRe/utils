@@ -94,6 +94,32 @@ abstract class CRUDController extends Controller
     }
 
     /**
+     * @param $entity
+     */
+    protected function save($entity)
+    {
+        $em = $this->get('doctrine.orm.entity_manager');
+        $em->persist($entity);
+        $em->flush($entity);
+    }
+
+    /**
+     * @param $entity
+     */
+    protected function onCreateSuccess($entity)
+    {
+        $this->save($entity);
+    }
+
+    /**
+     * @param $entity
+     */
+    protected function onUpdateSuccess($entity)
+    {
+        $this->save($entity);
+    }
+
+    /**
      * @param object  $entity
      * @param Request $request
      *
@@ -109,9 +135,13 @@ abstract class CRUDController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->get('doctrine.orm.entity_manager');
-            $em->persist($entity);
-            $em->flush($entity);
+
+            if ($entity->getId() == null) {
+                $this->onCreateSuccess($entity);
+            } else {
+                $this->onUpdateSuccess($entity);
+            }
+
             $response = $responseBuilder
                 ->setTranformableItem($entity, $this->createEntityTransformer())
                 ->build();

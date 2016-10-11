@@ -25,6 +25,11 @@ class JsonResponseBuilder
     protected $fractal;
 
     /**
+     * @var JsonResponse
+     */
+    protected $response;
+
+    /**
      * JsonResponseBuilder constructor.
      *
      * @param Manager $fractal
@@ -33,6 +38,7 @@ class JsonResponseBuilder
     {
         $this->body = [];
         $this->fractal = $fractal;
+        $this->response = new JsonResponse();
     }
 
     /**
@@ -101,6 +107,22 @@ class JsonResponseBuilder
      */
     public function build(int $statusCode = 200)
     {
-        return new JsonResponse($this->body, $statusCode);
+        $this->response->setStatusCode($statusCode);
+        $this->response->setData($this->body);
+
+        return $this->response;
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function setHeader(string $key, string $value)
+    {
+        $this->response->headers->set($key, $value);
+
+        return $this;
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace PrivateDev\Utils\Filter;
+namespace PrivateDev\Utils\Filter\Model;
 
 /**
  * Filter model
