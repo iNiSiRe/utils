@@ -49,6 +49,13 @@ class QueryBuilder
                     ->setParameter(sprintf('%s_value', $key), $value);
             }
 
+            // DateTime
+            if ($value instanceof \DateTime) {
+                $this->builder
+                    ->andWhere(sprintf('%1$s.%2$s = :%2$s_value', self::ALIAS, $key))
+                    ->setParameter(sprintf('%s_value', $key), $value);
+            }
+            
             // Range
             if (is_object($value) && $value instanceof Range) {
 
