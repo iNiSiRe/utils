@@ -86,6 +86,21 @@ class QueryBuilder
     }
 
     /**
+     * @param array $order
+     *
+     * @return $this
+     */
+    public function setOrder(array $order)
+    {
+        foreach ($order as $field => $type)
+        {
+            $this->builder->addOrderBy(sprintf('%s.%s', self::ALIAS, $field), $type);
+        }
+
+        return $this;
+    }
+
+    /**
      * @return Query
      */
     public function getQuery()

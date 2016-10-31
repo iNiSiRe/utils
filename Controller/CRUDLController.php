@@ -44,6 +44,14 @@ abstract class CRUDLController extends CRUDController
     /**
      * @return array
      */
+    protected function createOrder()
+    {
+        return [];
+    }
+
+    /**
+     * @return array
+     */
     protected function getRoles()
     {
         return array_merge(parent::getRoles(), [
@@ -82,7 +90,9 @@ abstract class CRUDLController extends CRUDController
         ) {
             $builder = $this->getFilterQueryBuilder()
                 ->setFilter($filterForm->getData())
-                ->setPagination($paginationForm->getData());
+                ->setPagination($paginationForm->getData())
+                ->setOrder($this->createOrder())
+            ;
 
             $entities = $builder->getQuery()->getResult();
 
