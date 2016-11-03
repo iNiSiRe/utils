@@ -3,6 +3,8 @@
 namespace PrivateDev\Utils\Controller;
 
 use Doctrine\ORM\EntityRepository;
+use PrivateDev\Utils\Entity\TranslatableEntityInterface;
+use PrivateDev\Utils\Entity\Translation;
 use PrivateDev\Utils\Error\ErrorCodes;
 use PrivateDev\Utils\Form\FormErrorAdapter;
 use PrivateDev\Utils\Fractal\TransformerAbstract;
@@ -94,6 +96,32 @@ abstract class CRUDController extends Controller
     }
 
     /**
+     * @param $entity
+     */
+    protected function save($entity)
+    {
+        $em = $this->get('doctrine.orm.entity_manager');
+        $em->persist($entity);
+        $em->flush($entity);
+    }
+
+    /**
+     * @param $entity
+     */
+    protected function onCreateSuccess($entity)
+    {
+        $this->save($entity);
+    }
+
+    /**
+     * @param $entity
+     */
+    protected function onUpdateSuccess($entity)
+    {
+        $this->save($entity);
+    }
+
+    /**
      * @param object  $entity
      * @param Request $request
      *
@@ -109,9 +137,30 @@ abstract class CRUDController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->get('doctrine.orm.entity_manager');
-            $em->persist($entity);
-            $em->flush($entity);
+
+            if ($entity instanceof TranslatableEntityInterface) {
+                $language = $request->getPreferredLanguage();
+
+
+                $translation = $entity->getTranslation() ? $entity->getTranslation() : new Translation();
+                $translation->setEntityClass(get_class($entity));
+
+                $fields = $entity->getTranslatableFields();
+
+                foreach ($fields as $field) {
+                    $translation->setFieldTranslation($field, $entity->{'get' . ucfirst($field)}(), $language);
+                }
+                $this->save($translation);
+
+                $entity->setTranslation($translation);
+            }
+
+            if ($entity->getId() == null) {
+                $this->onCreateSuccess($entity);
+            } else {
+                $this->onUpdateSuccess($entity);
+            }
+
             $response = $responseBuilder
                 ->setTranformableItem($entity, $this->createEntityTransformer())
                 ->build();

@@ -6,6 +6,7 @@ use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
 use League\Fractal\Resource\ResourceInterface;
 use PrivateDev\Utils\Fractal\TransformerAbstract;
+use PrivateDev\Utils\Fractal\Translatable;
 
 class TransformableJsonResponseBuilder extends JsonResponseBuilder
 {
@@ -31,23 +32,37 @@ class TransformableJsonResponseBuilder extends JsonResponseBuilder
 
     /**
      * @param $object
-     * @param $transformer
-     *
+     * @param TransformerAbstract $transformer
      * @return TransformableJsonResponseBuilder
+     * @throws \Exception
      */
     public function setTranformableItem($object, TransformerAbstract $transformer)
     {
+        if ($transformer instanceof Translatable) {
+            if (is_null($this->requestStack)) {
+                throw new \Exception("You must set RequestSet in service definition for translatable entity");
+            }
+            $transformer->setLanguage($this->requestStack->getCurrentRequest()->getLocale());
+        }
+
         return $this->setTransformableResource(new Item($object, $transformer, $transformer->getResourceKey()));
     }
 
     /**
      * @param $collection
-     * @param $transformer
-     *
+     * @param TransformerAbstract $transformer
      * @return TransformableJsonResponseBuilder
+     * @throws \Exception
      */
     public function setTransformableCollection($collection, TransformerAbstract $transformer)
     {
+        if ($transformer instanceof Translatable) {
+            if (is_null($this->requestStack)) {
+                throw new \Exception("You must set RequestSet in service definition for translatable entity");
+            }
+            $transformer->setLanguage($this->requestStack->getCurrentRequest()->getLocale());
+        }
+
         return $this->setTransformableResource(new Collection($collection, $transformer, $transformer->getResourceKey()));
     }
 }

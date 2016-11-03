@@ -2,9 +2,13 @@
 
 namespace PrivateDev\Utils\Controller;
 
-use Doctrine\ORM\QueryBuilder;
 use PrivateDev\Utils\Error\ErrorCodes;
+use PrivateDev\Utils\Filter as Filter;
+use PrivateDev\Utils\Filter\Form\PaginationForm;
+use PrivateDev\Utils\Filter\Model\FilterInterface;
+use PrivateDev\Utils\Filter\Model\Pagination;
 use PrivateDev\Utils\Form\FormErrorAdapter;
+use PrivateDev\Utils\Permission\Permissions;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\Form\FormInterface;
@@ -15,11 +19,35 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 abstract class CRUDLController extends CRUDController
 {
     const ACTION_LIST = 5;
+    const PAGINATION_TOTAL_SIZE = 'X-Pagination-Size';
 
     /**
+     * @param FilterInterface $filter
+     *
      * @return FormInterface
      */
-    abstract protected function createFilterForm();
+    abstract protected function createFilterForm(FilterInterface $filter);
+
+    /**
+     * @return FilterInterface
+     */
+    abstract protected function createFilter();
+
+    /**
+     * @return Pagination
+     */
+    protected function createPagination()
+    {
+        return new Pagination();
+    }
+
+    /**
+     * @return array
+     */
+    protected function createOrder()
+    {
+        return [];
+    }
 
     /**
      * @return array
@@ -27,52 +55,62 @@ abstract class CRUDLController extends CRUDController
     protected function getRoles()
     {
         return array_merge(parent::getRoles(), [
-            self::ACTION_LIST => null
+            self::ACTION_LIST => Permissions::EMPTY
         ]);
-    }
-
-    /**
-     * @return int
-     */
-    protected function getCollectionMaxSize() : int
-    {
-        return 100;
-    }
-
-    /**
-     * @param QueryBuilder $builder
-     * @param string       $alias
-     * @param array        $filter
-     */
-    protected function buildFilterQuery(QueryBuilder $builder, string $alias, array $filter)
-    {
-        foreach ($filter as $key => $value) {
-
-            if ($value === null) {
-                continue;
-            }
-
-            $builder->andWhere("{$alias}.{$key} = :{$key}_value")
-                ->setParameter("{$key}_value", $value);
-        }
-
-        $builder->setMaxResults($this->getCollectionMaxSize());
     }
 
     const QUERY_BUILDER_ALIAS = 'e';
 
     /**
-     * @param array $filter
-     *
-     * @return array
+     * @return Filter\QueryBuilder
      */
-    protected function findByFilter(array $filter)
+    protected function getFilterQueryBuilder()
     {
-        $builder = $this->getEntityRepository()->createQueryBuilder(self::QUERY_BUILDER_ALIAS);
+        return new Filter\QueryBuilder($this->getEntityRepository());
+    }
 
-        $this->buildFilterQuery($builder, self::QUERY_BUILDER_ALIAS, $filter);
+    /**
+     * @param Request         $request
+     * @param FilterInterface $filter
+     * @param Pagination      $pagination
+     *
+     * @return JsonResponse
+     */
+    protected function doList(Request $request, FilterInterface $filter, Pagination $pagination)
+    {
+        $filterForm = $this->createFilterForm($filter);
+        $paginationForm = $this->createForm(PaginationForm::class, $pagination);
 
-        return $builder->getQuery()->getResult();
+        $filterForm->handleRequest($request);
+        $paginationForm->handleRequest($request);
+
+        if (
+            ($filterForm->isValid() || !$filterForm->isSubmitted())
+            && ($paginationForm->isValid() || !$paginationForm->isSubmitted())
+        ) {
+            $builder = $this->getFilterQueryBuilder()
+                ->setFilter($filterForm->getData())
+                ->setPagination($paginationForm->getData())
+                ->setOrder($this->createOrder())
+            ;
+
+            $entities = $builder->getQuery()->getResult();
+
+            $responseBuilder = $this->getResponseBuilder()
+                ->setTransformableCollection($entities, $this->createEntityTransformer());
+
+            if ($this->isResponseIncludePagination()) {
+                $responseBuilder->setHeader(self::PAGINATION_TOTAL_SIZE, $builder->getTotalSize());
+            }
+
+            $response = $responseBuilder->build();
+        } else {
+            $response = $this->getResponseBuilder()
+                ->addErrorList(new FormErrorAdapter($filterForm->getErrors(true), ErrorCodes::VALIDATION_ERROR))
+                ->build(JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        return $response;
     }
 
     /**
@@ -91,26 +129,14 @@ abstract class CRUDLController extends CRUDController
             throw new AccessDeniedHttpException();
         }
 
-        $filter = $this->createFilterForm();
-        $filter->handleRequest($request);
+        return $this->doList($request, $this->createFilter(), $this->createPagination());
+    }
 
-        if ($filter->isValid() || !$filter->isSubmitted()) {
-
-            $filterData = $filter->isSubmitted()
-                ? $filter->getData()
-                : [];
-
-            $entities = $this->findByFilter($filterData);
-
-            $response = $this->getResponseBuilder()
-                ->setTransformableCollection($entities, $this->createEntityTransformer())
-                ->build();
-        } else {
-            $response = $this->getResponseBuilder()
-                ->addErrorList(new FormErrorAdapter($filter->getErrors(true), ErrorCodes::VALIDATION_ERROR))
-                ->build(JsonResponse::HTTP_BAD_REQUEST);
-        }
-
-        return $response;
+    /**
+     * @return boolean
+     */
+    protected function isResponseIncludePagination()
+    {
+        return false;
     }
 }
