@@ -3,6 +3,8 @@
 namespace PrivateDev\Utils\Controller;
 
 use Doctrine\ORM\EntityRepository;
+use PrivateDev\Utils\Entity\TranslatableEntityInterface;
+use PrivateDev\Utils\Entity\Translation;
 use PrivateDev\Utils\Error\ErrorCodes;
 use PrivateDev\Utils\Form\FormErrorAdapter;
 use PrivateDev\Utils\Fractal\TransformerAbstract;
@@ -17,6 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 abstract class CRUDController extends Controller
 {
@@ -100,7 +103,7 @@ abstract class CRUDController extends Controller
     {
         $em = $this->get('doctrine.orm.entity_manager');
         $em->persist($entity);
-        $em->flush($entity);
+        $em->flush();
     }
 
     /**
@@ -136,6 +139,20 @@ abstract class CRUDController extends Controller
 
         if ($form->isValid()) {
 
+            if ($entity instanceof TranslatableEntityInterface) {
+                $language = $request->getPreferredLanguage();
+                
+                $translation = $entity->getTranslation() ? $entity->getTranslation() : new Translation();
+                $translation->setEntityClass(get_class($entity));
+
+                $propertyAccessor = new PropertyAccessor();
+                foreach ($entity->getTranslatableFields() as $field) {
+                    $translation->setFieldTranslation($field, $propertyAccessor->getValue($entity, $field), $language);
+                }
+
+                $entity->setTranslation($translation);
+            }
+
             if ($entity->getId() == null) {
                 $this->onCreateSuccess($entity);
             } else {
@@ -143,7 +160,7 @@ abstract class CRUDController extends Controller
             }
 
             $response = $responseBuilder
-                ->setTranformableItem($entity, $this->createEntityTransformer())
+                ->setTransformableItem($entity, $this->createEntityTransformer())
                 ->build();
         } else {
             $response = $responseBuilder
@@ -194,7 +211,7 @@ abstract class CRUDController extends Controller
         $this->postEntityLoadCheckAccess(self::ACTION_READ, $entity);
 
         return $this->getResponseBuilder()
-            ->setTranformableItem($entity, $this->createEntityTransformer())
+            ->setTransformableItem($entity, $this->createEntityTransformer())
             ->build();
     }
 

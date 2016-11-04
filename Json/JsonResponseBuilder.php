@@ -11,6 +11,7 @@ use PrivateDev\Utils\Error\ErrorListInterface;
 use PrivateDev\Utils\Form\FormErrorAdapter;
 use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class JsonResponseBuilder
 {
@@ -28,6 +29,10 @@ class JsonResponseBuilder
      * @var JsonResponse
      */
     protected $response;
+    /**
+     * @var RequestStack
+     */
+    protected $requestStack;
 
     /**
      * JsonResponseBuilder constructor.
@@ -39,6 +44,11 @@ class JsonResponseBuilder
         $this->body = [];
         $this->fractal = $fractal;
         $this->response = new JsonResponse();
+    }
+
+    public function setRequestStack(RequestStack $requestStack)
+    {
+        $this->requestStack = $requestStack;
     }
 
     /**
