@@ -80,7 +80,7 @@ class Translation
     public function getFieldTranslation($field, $language)
     {
         if (isset($this->translation[$language]) && isset($this->translation[$language][$field])) {
-            return $this->translation[$language];
+            return $this->translation[$language][$field];
         } else {
             throw new \Exception(sprintf("translation %s to %s language not found for %s class", $field, $language, static::class));
         }
