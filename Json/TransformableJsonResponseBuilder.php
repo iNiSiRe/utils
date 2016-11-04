@@ -6,7 +6,7 @@ use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
 use League\Fractal\Resource\ResourceInterface;
 use PrivateDev\Utils\Fractal\TransformerAbstract;
-use PrivateDev\Utils\Fractal\Translatable;
+use PrivateDev\Utils\Fractal\TranslatableTransformerInterface;
 
 class TransformableJsonResponseBuilder extends JsonResponseBuilder
 {
@@ -38,7 +38,7 @@ class TransformableJsonResponseBuilder extends JsonResponseBuilder
      */
     public function setTransformableItem($object, TransformerAbstract $transformer)
     {
-        if ($transformer instanceof Translatable) {
+        if ($transformer instanceof TranslatableTransformerInterface) {
             if (is_null($this->requestStack)) {
                 throw new \Exception("You must set RequestSet in service definition for translatable entity");
             }
@@ -56,7 +56,7 @@ class TransformableJsonResponseBuilder extends JsonResponseBuilder
      */
     public function setTransformableCollection($collection, TransformerAbstract $transformer)
     {
-        if ($transformer instanceof Translatable) {
+        if ($transformer instanceof TranslatableTransformerInterface) {
             if (is_null($this->requestStack)) {
                 throw new \Exception("You must set RequestSet in service definition for translatable entity");
             }

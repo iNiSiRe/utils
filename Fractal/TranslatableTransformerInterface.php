@@ -2,7 +2,7 @@
 namespace PrivateDev\Utils\Fractal;
 
 
-interface Translatable
+interface TranslatableTransformerInterface
 {
     public function setLanguage(string $language);
 }
