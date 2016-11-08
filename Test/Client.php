@@ -31,10 +31,11 @@ class Client
 
     /**
      * @param Request $request
+     * @param bool    $jsonDecode
      *
      * @return array
      */
-    public function request(Request $request)
+    public function request(Request $request, $jsonDecode = true)
     {
         if ($request->isPerformAuth()) {
             $headers = ['HTTP_' . JsonWebTokenAuthenticator::HEADER => $request->getAuthToken()];
@@ -53,7 +54,7 @@ class Client
         $response = $this->client->getResponse();
 
         return [
-            json_decode($response->getContent(), true),
+            $jsonDecode === true ? json_decode($response->getContent(), true) : $response->getContent(),
             $response->getStatusCode(),
             $response->headers->all()
         ];
