@@ -26,12 +26,18 @@ abstract class CRUDLController extends CRUDController
      *
      * @return FormInterface
      */
-    abstract protected function createFilterForm(FilterInterface $filter);
+    protected function createFilterForm(FilterInterface $filter)
+    {
+        return $this->createForm(Filter\Form\EmptyFilterForm::class, $filter);
+    }
 
     /**
      * @return FilterInterface
      */
-    abstract protected function createFilter();
+    protected function createFilter()
+    {
+        return new Filter\Model\EmptyFilter();
+    }
 
     /**
      * @return Pagination
