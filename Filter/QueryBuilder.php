@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use PrivateDev\Utils\Filter\Model\FilterInterface;
 use PrivateDev\Utils\Filter\Model\Pagination;
+use PrivateDev\Utils\Filter\Model\PartialMatchText;
 use PrivateDev\Utils\Filter\Model\Range;
 
 class QueryBuilder
@@ -15,12 +16,12 @@ class QueryBuilder
     /**
      * @var EntityRepository
      */
-    private $repository;
+    protected $repository;
 
     /**
      * @var \Doctrine\ORM\QueryBuilder
      */
-    private $builder;
+    protected $builder;
 
     /**
      * FilterQueryBuilder constructor
@@ -34,43 +35,57 @@ class QueryBuilder
     }
 
     /**
+     * @param $key
+     * @param $value
+     */
+    protected function addCondition($key, $value, $alias = self::ALIAS)
+    {
+        // String, numeric, bool
+        if (is_string($value) || is_numeric($value) || is_bool($value)) {
+            $this->builder
+                ->andWhere(sprintf('%1$s.%2$s = :%2$s_value', $alias, $key))
+                ->setParameter(sprintf('%s_value', $key), $value);
+        }
+
+        // DateTime
+        if ($value instanceof \DateTime) {
+            $this->builder
+                ->andWhere(sprintf('%1$s.%2$s = :%2$s_value', $alias, $key))
+                ->setParameter(sprintf('%s_value', $key), $value);
+        }
+
+        // Range
+        if (is_object($value) && $value instanceof Range) {
+
+            if ($value->getFrom()) {
+                $this->builder
+                    ->andWhere(sprintf('%1$s.%2$s >= :%2$s_from', $alias, $key))
+                    ->setParameter(sprintf('%s_from', $key), $value->getFrom());
+            }
+
+            if ($value->getTo()) {
+                $this->builder
+                    ->andWhere(sprintf('%1$s.%2$s <= :%2$s_to', $alias, $key))
+                    ->setParameter(sprintf('%s_to', $key), $value->getTo());
+            }
+        }
+
+        if (is_object($value) && $value instanceof PartialMatchText) {
+            $this->builder
+                ->andWhere(sprintf('%1$s.%2$s LIKE :%2$s_value', $alias, $key))
+                ->setParameter(sprintf('%s_value', $key), $value->getText() . '%');
+        }
+    }
+
+    /**
      * @param FilterInterface $filter
      *
      * @return $this
      */
-    public function setFilter(FilterInterface $filter)
+    public function setFilter(FilterInterface $filter, $alias = self::ALIAS)
     {
         foreach ($filter->getFilter() as $key => $value) {
-
-            // String, numeric, bool
-            if (is_string($value) || is_numeric($value) || is_bool($value)) {
-                $this->builder
-                    ->andWhere(sprintf('%1$s.%2$s = :%2$s_value', self::ALIAS, $key))
-                    ->setParameter(sprintf('%s_value', $key), $value);
-            }
-
-            // DateTime
-            if ($value instanceof \DateTime) {
-                $this->builder
-                    ->andWhere(sprintf('%1$s.%2$s = :%2$s_value', self::ALIAS, $key))
-                    ->setParameter(sprintf('%s_value', $key), $value);
-            }
-            
-            // Range
-            if (is_object($value) && $value instanceof Range) {
-
-                if ($value->getFrom()) {
-                    $this->builder
-                        ->andWhere(sprintf('%1$s.%2$s >= :%2$s_from', self::ALIAS, $key))
-                        ->setParameter(sprintf('%s_from', $key), $value->getFrom());
-                }
-
-                if ($value->getTo()) {
-                    $this->builder
-                        ->andWhere(sprintf('%1$s.%2$s <= :%2$s_to', self::ALIAS, $key))
-                        ->setParameter(sprintf('%s_to', $key), $value->getTo());
-                }
-            }
+            $this->addCondition($key, $value, $alias);
         }
 
         $this->builder->setMaxResults($filter->getCollectionMaxSize());
