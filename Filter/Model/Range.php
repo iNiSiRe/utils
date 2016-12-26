@@ -2,7 +2,7 @@
 
 namespace PrivateDev\Utils\Filter\Model;
 
-class Range extends AbstractFilter
+class Range
 {
     /**
      * @var mixed

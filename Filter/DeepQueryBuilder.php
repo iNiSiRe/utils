@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: user18
- * Date: 23.12.16
- * Time: 13:09
- */
 
 namespace PrivateDev\Utils\Filter;
 
