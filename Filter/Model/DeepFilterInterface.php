@@ -4,13 +4,10 @@ namespace PrivateDev\Utils\Filter\Model;
 
 use Doctrine\ORM\Query\Expr\Join;
 
-class AbstractDeepFilter extends AbstractFilter
+interface DeepFilterInterface extends FilterInterface
 {
     /**
      * @return Join[]
      */
-    public function getJoins()
-    {
-        return [];
-    }
+    public function getJoins();
 }

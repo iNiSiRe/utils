@@ -3,37 +3,49 @@
 namespace PrivateDev\Utils\Filter;
 
 use Doctrine\ORM\EntityRepository;
-use PrivateDev\Utils\Filter\Model\AbstractDeepFilter;
+use PrivateDev\Utils\Filter\Model\DeepFilterInterface;
 use PrivateDev\Utils\Filter\Model\FilterInterface;
+use Symfony\Component\Form\FormInterface;
 
 class DeepQueryBuilder extends QueryBuilder
 {
     /**
-     * FilterQueryBuilder constructor
-     *
-     * @param EntityRepository $repository
-     */
-    public function __construct(EntityRepository $repository)
-    {
-        parent::__construct($repository);
-    }
-
-    /**
-     * @param AbstractDeepFilter $filter
+     * @param FilterInterface $filter
      *
      * @return $this
      */
     public function setFilter(FilterInterface $filter, $alias = self::ALIAS)
     {
-        if ($filter instanceof AbstractDeepFilter) {
-            if (count($filter->getJoins()) > 0) {
-                foreach ($filter->getJoins() as $join) {
-                    $this->builder->add('join', [$join], true);
-                }
+        $this->createQueryBuilder($filter);
+        $this->addDeepFilter($filter, $filter->getRelationshipAlias());
+        $this->builder->setMaxResults($filter->getCollectionMaxSize());
+
+        return $this;
+    }
+
+    /**
+     * @param DeepFilterInterface $filter
+     */
+    protected function addDeepFilter(DeepFilterInterface $filter, $alias)
+    {
+        if (count($filter->getJoins()) > 0) {
+            foreach ($filter->getJoins() as $join) {
+                $this->builder->add('join', [$join], true);
             }
         }
 
-        return parent::setFilter($filter);
+        $this->addFilter($filter, $alias);
+    }
+
+    /**
+     * @param FilterInterface $filter
+     * @param string          $alias
+     */
+    protected function addFilter(FilterInterface $filter, $alias)
+    {
+        foreach ($filter->getFilter() as $key => $value) {
+            $this->addCondition($key, $value, $alias);
+        }
     }
 
     /**
@@ -42,10 +54,18 @@ class DeepQueryBuilder extends QueryBuilder
      */
     protected function addCondition($key, $value, $alias = self::ALIAS)
     {
-        parent::addCondition($key, $value, $alias);
+        if (is_object($value) && $value instanceof DeepFilterInterface) {
+            $this->addDeepFilter($value, $key);
+
+            return;
+        }
 
         if (is_object($value) && $value instanceof FilterInterface) {
-            parent::setFilter($value, $key);
+            $this->addFilter($value, $key);
+
+            return;
         }
+
+        parent::addCondition($key, $value, $alias);
     }
 }

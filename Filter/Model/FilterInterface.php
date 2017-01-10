@@ -10,4 +10,6 @@ interface FilterInterface
     public function getCollectionMaxSize() : int;
 
     public function getFilter() : array;
+
+    public function getRelationshipAlias();
 }

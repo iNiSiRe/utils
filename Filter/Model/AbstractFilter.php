@@ -22,4 +22,12 @@ abstract class AbstractFilter implements FilterInterface
     {
         return get_object_vars($this);
     }
+
+    /**
+     * @return string
+     */
+    public function getRelationshipAlias()
+    {
+        return 'a';
+    }
 }

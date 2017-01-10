@@ -65,8 +65,6 @@ abstract class CRUDLController extends CRUDController
         ]);
     }
 
-    const QUERY_BUILDER_ALIAS = 'e';
-
     /**
      * @return Filter\QueryBuilder
      */
