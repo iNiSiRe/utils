@@ -12,14 +12,17 @@ use Doctrine\ORM\Mapping\PreUpdate;
  */
 trait TranslatableTransformerTrait
 {
-    protected $language;
+    /**
+     * @var string
+     */
+    protected $language = '';
 
     public function setLanguage(string $language)
     {
         $this->language = $language;
     }
 
-    public function getLanguage()
+    public function getLanguage() : string
     {
         return $this->language;
     }
