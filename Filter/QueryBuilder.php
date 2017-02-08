@@ -76,7 +76,7 @@ class QueryBuilder
             case (is_object($value) && $value instanceof PartialMatchText): {
                 $this->builder
                     ->andWhere(sprintf('%1$s.%2$s LIKE :%2$s_value', $alias, $key))
-                    ->setParameter(sprintf('%s_value', $key), $value->getText() . '%');
+                    ->setParameter(sprintf('%s_value', $key), '%' . $value->getText() . '%');
             } break;
 
             // Empty
