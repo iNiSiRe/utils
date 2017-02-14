@@ -60,7 +60,7 @@ class TransformableJsonResponseBuilder extends JsonResponseBuilder
             if (is_null($this->requestStack)) {
                 throw new \Exception("You must set RequestSet in service definition for translatable entity");
             }
-            $transformer->setLanguage($this->requestStack->getCurrentRequest()->getPreferredLanguage());
+            $transformer->setLanguage((string) $this->requestStack->getCurrentRequest()->getPreferredLanguage());
         }
 
         return $this->setTransformableResource(new Collection($collection, $transformer, $transformer->getResourceKey()));
