@@ -164,7 +164,7 @@ abstract class CRUDController extends Controller
                 ->build();
         } else {
             $response = $responseBuilder
-                ->addErrorList(new FormErrorAdapter($form->getErrors(true), ErrorCodes::VALIDATION_ERROR))
+                ->addErrorList(new FormErrorAdapter($form->getErrors(true)))
                 ->build(JsonResponse::HTTP_BAD_REQUEST);
         }
 

@@ -9,7 +9,7 @@ use PrivateDev\Utils\Filter\Model\FilterInterface;
 use PrivateDev\Utils\Filter\Model\Pagination;
 use PrivateDev\Utils\Filter\Model\PartialMatchText;
 use PrivateDev\Utils\Filter\Model\Range;
-use Symfony\Component\Form\FormInterface;
+use PrivateDev\Utils\Order\OrderInterface;
 
 class QueryBuilder
 {
@@ -128,13 +128,13 @@ class QueryBuilder
     }
 
     /**
-     * @param array $order
+     * @param OrderInterface $order
      *
      * @return $this
      */
-    public function setOrder(array $order)
+    public function setOrder(OrderInterface $order)
     {
-        foreach ($order as $field => $type)
+        foreach ($order->getOrder() as $field => $type)
         {
             $this->builder->addOrderBy(sprintf('%s.%s', self::ALIAS, $field), $type);
         }

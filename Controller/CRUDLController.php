@@ -8,6 +8,9 @@ use PrivateDev\Utils\Filter\Form\PaginationForm;
 use PrivateDev\Utils\Filter\Model\FilterInterface;
 use PrivateDev\Utils\Filter\Model\Pagination;
 use PrivateDev\Utils\Form\FormErrorAdapter;
+use PrivateDev\Utils\Order\Form\EmptyOrderForm;
+use PrivateDev\Utils\Order\Model\EmptyOrder;
+use PrivateDev\Utils\Order\OrderInterface;
 use PrivateDev\Utils\Permission\Permissions;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -48,11 +51,21 @@ abstract class CRUDLController extends CRUDController
     }
 
     /**
-     * @return array
+     * @param OrderInterface $order
+     *
+     * @return FormInterface
+     */
+    protected function createOrderForm(OrderInterface $order)
+    {
+        return $this->createForm(EmptyOrderForm::class, $order);
+    }
+
+    /**
+     * @return OrderInterface
      */
     protected function createOrder()
     {
-        return [];
+        return new EmptyOrder();
     }
 
     /**
@@ -77,25 +90,29 @@ abstract class CRUDLController extends CRUDController
      * @param Request         $request
      * @param FilterInterface $filter
      * @param Pagination      $pagination
+     * @param OrderInterface  $order
      *
      * @return JsonResponse
      */
-    protected function doList(Request $request, FilterInterface $filter, Pagination $pagination)
+    protected function doList(Request $request, FilterInterface $filter, Pagination $pagination, OrderInterface $order)
     {
         $filterForm = $this->createFilterForm($filter);
         $paginationForm = $this->createForm(PaginationForm::class, $pagination);
+        $orderForm = $this->createOrderForm($order);
 
         $filterForm->handleRequest($request);
         $paginationForm->handleRequest($request);
+        $orderForm->handleRequest($request);
 
         if (
             ($filterForm->isValid() || !$filterForm->isSubmitted())
             && ($paginationForm->isValid() || !$paginationForm->isSubmitted())
+            && ($orderForm->isValid() || !$orderForm->isSubmitted())
         ) {
             $builder = $this->getFilterQueryBuilder()
                 ->setFilter($filterForm->getData())
                 ->setPagination($paginationForm->getData())
-                ->setOrder($this->createOrder())
+                ->setOrder($orderForm->getData())
             ;
 
             $entities = $builder->getQuery()->getResult();
@@ -133,7 +150,7 @@ abstract class CRUDLController extends CRUDController
             throw new AccessDeniedHttpException();
         }
 
-        return $this->doList($request, $this->createFilter(), $this->createPagination());
+        return $this->doList($request, $this->createFilter(), $this->createPagination(), $this->createOrder());
     }
 
     /**
