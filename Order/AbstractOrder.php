@@ -4,6 +4,10 @@ namespace PrivateDev\Utils\Order;
 
 class AbstractOrder implements OrderInterface
 {
+    const ASC = 'ASC';
+
+    const DESC = 'DESC';
+
     /**
      * @return array
      */
