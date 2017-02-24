@@ -36,6 +36,14 @@ class QueryBuilder
     }
 
     /**
+     * @param string $key
+     */
+    protected function createPlaceholder($key)
+    {
+        return str_replace('.', '_', $key);
+    }
+
+    /**
      * @param $key
      * @param $value
      */
@@ -45,15 +53,15 @@ class QueryBuilder
             // String, numeric, bool
             case (is_string($value) || is_numeric($value) || is_bool($value)): {
                 $this->builder
-                    ->andWhere(sprintf('%1$s.%2$s = :%1$s_%2$s_value', $alias, $key))
-                    ->setParameter(sprintf('%s_%s_value', $alias, $key), $value);
+                    ->andWhere(sprintf('%1$s.%2$s = :%1$s_%3$s_value', $alias, $key, $this->createPlaceholder($key)))
+                    ->setParameter(sprintf('%s_%s_value', $alias, $this->createPlaceholder($key)), $value);
             } break;
 
             // DateTime
             case ($value instanceof \DateTime): {
                 $this->builder
-                    ->andWhere(sprintf('%1$s.%2$s = :%1$s_%2$s_value', $alias, $key))
-                    ->setParameter(sprintf('%s_%s_value', $alias, $key), $value);
+                    ->andWhere(sprintf('%1$s.%2$s = :%1$s_%3$s_value', $alias, $key, $this->createPlaceholder($key)))
+                    ->setParameter(sprintf('%s_%s_value', $alias, $this->createPlaceholder($key)), $value);
             } break;
 
             // Range
@@ -61,22 +69,22 @@ class QueryBuilder
 
                 if ($value->getFrom()) {
                     $this->builder
-                        ->andWhere(sprintf('%1$s.%2$s >= :%1$s_%2$s_from', $alias, $key))
-                        ->setParameter(sprintf('%s_%s_from', $alias, $key), $value->getFrom());
+                        ->andWhere(sprintf('%1$s.%2$s >= :%1$s_%3$s_from', $alias, $key, $this->createPlaceholder($key)))
+                        ->setParameter(sprintf('%s_%s_from', $alias, $this->createPlaceholder($key)), $value->getFrom());
                 }
 
                 if ($value->getTo()) {
                     $this->builder
-                        ->andWhere(sprintf('%1$s.%2$s <= :%1$s_%2$s_to', $alias, $key))
-                        ->setParameter(sprintf('%s_%s_to', $alias, $key), $value->getTo());
+                        ->andWhere(sprintf('%1$s.%2$s <= :%1$s_%3$s_to', $alias, $key, $this->createPlaceholder($key)))
+                        ->setParameter(sprintf('%s_%s_to', $alias, $this->createPlaceholder($key)), $value->getTo());
                 }
             } break;
 
             // Operator "LIKE"
             case (is_object($value) && $value instanceof PartialMatchText): {
                 $this->builder
-                    ->andWhere(sprintf('%1$s.%2$s LIKE :%2$s_value', $alias, $key))
-                    ->setParameter(sprintf('%s_value', $key), '%' . $value->getText() . '%');
+                    ->andWhere(sprintf('%1$s.%2$s LIKE :%3$s_value', $alias, $key, $this->createPlaceholder($key)))
+                    ->setParameter(sprintf('%s_%s_value', $alias, $this->createPlaceholder($key)), '%' . $value->getText() . '%');
             } break;
 
             // Empty
