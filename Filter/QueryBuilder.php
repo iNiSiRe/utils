@@ -83,7 +83,7 @@ class QueryBuilder
             // Operator "LIKE"
             case (is_object($value) && $value instanceof PartialMatchText): {
                 $this->builder
-                    ->andWhere(sprintf('%1$s.%2$s LIKE :%3$s_value', $alias, $key, $this->createPlaceholder($key)))
+                    ->andWhere(sprintf('%1$s.%2$s LIKE :%1$s_%3$s_value', $alias, $key, $this->createPlaceholder($key)))
                     ->setParameter(sprintf('%s_%s_value', $alias, $this->createPlaceholder($key)), '%' . $value->getText() . '%');
             } break;
 
