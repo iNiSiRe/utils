@@ -154,14 +154,18 @@ abstract class CRUDController extends Controller
             }
 
             if ($entity->getId() == null) {
-                $this->onCreateSuccess($entity);
+                $payload = $this->onCreateSuccess($entity);
             } else {
-                $this->onUpdateSuccess($entity);
+                $payload = $this->onUpdateSuccess($entity);
             }
 
-            $response = $responseBuilder
-                ->setTransformableItem($entity, $this->createEntityTransformer())
-                ->build();
+            $responseBuilder->setTransformableItem($entity, $this->createEntityTransformer());
+
+            if ($payload !== null) {
+                $responseBuilder->setData('payload', $payload);
+            }
+
+            $response = $responseBuilder->build();
         } else {
             $response = $responseBuilder
                 ->addErrorList(new FormErrorAdapter($form->getErrors(true)))
