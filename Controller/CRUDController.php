@@ -64,6 +64,7 @@ abstract class CRUDController extends Controller
      */
     abstract protected function getResponseBuilder();
 
+
     /**
      * Roles for actions
      *
@@ -206,6 +207,22 @@ abstract class CRUDController extends Controller
     }
 
     /**
+     * @return array
+     */
+    protected function getCacheOptions()
+    {
+        return [];
+    }
+
+    /**
+     * @return Response
+     */
+    protected function applyCacheOptions(Response $response)
+    {
+        return $response->setCache($this->getCacheOptions());
+    }
+
+    /**
      * @param $entity
      *
      * @return JsonResponse
@@ -214,9 +231,11 @@ abstract class CRUDController extends Controller
     {
         $this->postEntityLoadCheckAccess(self::ACTION_READ, $entity);
 
-        return $this->getResponseBuilder()
+        $response = $this->getResponseBuilder()
             ->setTransformableItem($entity, $this->createEntityTransformer())
             ->build();
+
+        return $this->applyCacheOptions($response);
     }
 
     /**
