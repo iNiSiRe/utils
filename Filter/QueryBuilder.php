@@ -144,7 +144,7 @@ class QueryBuilder
     {
         foreach ($order->getOrder() as $field => $type)
         {
-            $this->builder->addOrderBy(sprintf('%s.%s', self::ALIAS, $field), $type);
+            $this->builder->addOrderBy(sprintf('%s.%s', $this->builder->getRootAliases()[0], $field), $type);
         }
 
         return $this;
