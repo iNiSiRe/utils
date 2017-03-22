@@ -2,8 +2,8 @@
 
 namespace PrivateDev\Utils\Filter;
 
-use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use PrivateDev\Utils\Filter\Model\EmptyData;
 use PrivateDev\Utils\Filter\Model\FilterInterface;
 use PrivateDev\Utils\Filter\Model\Pagination;
@@ -11,14 +11,9 @@ use PrivateDev\Utils\Filter\Model\PartialMatchText;
 use PrivateDev\Utils\Filter\Model\Range;
 use PrivateDev\Utils\Order\OrderInterface;
 
-class QueryBuilder
+abstract class AbstractQueryBuilder
 {
     const ALIAS = 'a';
-
-    /**
-     * @var EntityRepository
-     */
-    protected $repository;
 
     /**
      * @var \Doctrine\ORM\QueryBuilder
@@ -28,15 +23,33 @@ class QueryBuilder
     /**
      * FilterQueryBuilder constructor
      *
-     * @param EntityRepository $repository
+     * @param QueryBuilder $builder
      */
-    public function __construct(EntityRepository $repository)
+    public function __construct(QueryBuilder $builder)
     {
-        $this->repository = $repository;
+        $this->builder = $builder;
     }
 
     /**
+     * @param FilterInterface $filter
+     * @param string          $alias
+     *
+     * @return $this
+     */
+    abstract public function setFilter(FilterInterface $filter, $alias = self::ALIAS);
+
+    /**
+     * @param OrderInterface $order
+     * @param                $alias
+     *
+     * @return $this
+     */
+    abstract public function setOrder(OrderInterface $order, $alias = self::ALIAS);
+
+    /**
      * @param string $key
+     *
+     * @return mixed
      */
     protected function createPlaceholder($key)
     {
@@ -44,8 +57,9 @@ class QueryBuilder
     }
 
     /**
-     * @param $key
-     * @param $value
+     * @param        $key
+     * @param        $value
+     * @param string $alias
      */
     protected function addCondition($key, $value, $alias = self::ALIAS)
     {
@@ -96,30 +110,15 @@ class QueryBuilder
     }
 
     /**
-     * @param FilterInterface $filter
+     * @param        $field
+     * @param        $type
+     * @param string $alias
      */
-    protected function createQueryBuilder(FilterInterface $filter)
+    protected function addOrderCondition($field, $type, $alias = self::ALIAS)
     {
-        $this->builder = $this->repository->createQueryBuilder($filter->getRelationshipAlias());
+        $this->builder->addOrderBy(sprintf('%s.%s', $alias, $field), $type);
     }
 
-    /**
-     * @param FilterInterface $filter
-     *
-     * @return $this
-     */
-    public function setFilter(FilterInterface $filter, $alias = self::ALIAS)
-    {
-        $this->createQueryBuilder($filter);
-
-        foreach ($filter->getFilter() as $key => $value) {
-            $this->addCondition($key, $value, $alias);
-        }
-
-        $this->builder->setMaxResults($filter->getCollectionMaxSize());
-
-        return $this;
-    }
 
     /**
      * @param Pagination $pagination
@@ -131,21 +130,6 @@ class QueryBuilder
         $this->builder
             ->setFirstResult($pagination->getOffset())
             ->setMaxResults($pagination->getLimit());
-
-        return $this;
-    }
-
-    /**
-     * @param OrderInterface $order
-     *
-     * @return $this
-     */
-    public function setOrder(OrderInterface $order)
-    {
-        foreach ($order->getOrder() as $field => $type)
-        {
-            $this->builder->addOrderBy(sprintf('%s.%s', self::ALIAS, $field), $type);
-        }
 
         return $this;
     }

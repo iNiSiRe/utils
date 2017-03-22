@@ -23,11 +23,20 @@ abstract class AbstractFilter implements FilterInterface
         return get_object_vars($this);
     }
 
+    //TODO
     /**
      * @return string
      */
     public function getRelationshipAlias()
     {
         return 'a';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getJoins()
+    {
+        return [];
     }
 }
