@@ -2,9 +2,9 @@
 
 namespace PrivateDev\Utils\Order\Model;
 
-use PrivateDev\Utils\Order\AbstractOrder;
+use PrivateDev\Utils\Builder\Query\AbstractQuery;
 
-class EmptyOrder extends AbstractOrder
+class EmptyOrder extends AbstractQuery
 {
 
 }

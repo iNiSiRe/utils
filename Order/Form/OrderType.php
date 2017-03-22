@@ -6,7 +6,8 @@ use PrivateDev\Utils\Order\Form\Transformer\OrderTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\Choice;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class OrderType extends AbstractType
 {
@@ -26,7 +27,11 @@ class OrderType extends AbstractType
     {
         $resolver->setDefaults([
             'compound' => false,
-            'constraints' => new Choice(['choices' => ['ASC', 'DESC']])
+            'constraints' => new Callback(function($object, ExecutionContextInterface $context) {
+                if ($object !== 'DESC' && $object !== 'ASC' && $object !== "") {
+                    $context->addViolation('The value you selected is not a valid choice.');
+                }
+            })
         ]);
     }
 }

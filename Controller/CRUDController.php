@@ -5,7 +5,6 @@ namespace PrivateDev\Utils\Controller;
 use Doctrine\ORM\EntityRepository;
 use PrivateDev\Utils\Entity\TranslatableEntityInterface;
 use PrivateDev\Utils\Entity\Translation;
-use PrivateDev\Utils\Error\ErrorCodes;
 use PrivateDev\Utils\Form\FormErrorAdapter;
 use PrivateDev\Utils\Fractal\TransformerAbstract;
 use PrivateDev\Utils\Json\TransformableJsonResponseBuilder;
@@ -138,6 +137,7 @@ abstract class CRUDController extends Controller
         $form->handleRequest($request);
 
         if ($form->isValid()) {
+            $entity = $form->getData();
 
             if ($entity instanceof TranslatableEntityInterface) {
                 $language = $request->getPreferredLanguage();

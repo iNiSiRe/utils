@@ -2,16 +2,18 @@
 
 namespace PrivateDev\Utils\Controller;
 
+use PrivateDev\Utils\Builder\FilterQueryBuilder;
+use PrivateDev\Utils\Builder\OrderQueryBuilder;
+use PrivateDev\Utils\Builder\PaginationQueryBuilder;
 use PrivateDev\Utils\Error\ErrorCodes;
 use PrivateDev\Utils\Filter as Filter;
 use PrivateDev\Utils\Filter\Form\PaginationForm;
-use PrivateDev\Utils\Filter\Model\FilterInterface;
 use PrivateDev\Utils\Filter\Model\Pagination;
 use PrivateDev\Utils\Form\FormErrorAdapter;
 use PrivateDev\Utils\Order\Form\EmptyOrderForm;
 use PrivateDev\Utils\Order\Model\EmptyOrder;
-use PrivateDev\Utils\Order\OrderInterface;
 use PrivateDev\Utils\Permission\Permissions;
+use PrivateDev\Utils\Builder\Query\QueryInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\Form\FormInterface;
@@ -25,17 +27,17 @@ abstract class CRUDLController extends CRUDController
     const PAGINATION_TOTAL_SIZE = 'X-Pagination-Size';
 
     /**
-     * @param FilterInterface $filter
+     * @param QueryInterface $query
      *
      * @return FormInterface
      */
-    protected function createFilterForm(FilterInterface $filter)
+    protected function createFilterForm(QueryInterface $query)
     {
-        return $this->createForm(Filter\Form\EmptyFilterForm::class, $filter);
+        return $this->createForm(Filter\Form\EmptyFilterForm::class, $query);
     }
 
     /**
-     * @return FilterInterface
+     * @return QueryInterface
      */
     protected function createFilter()
     {
@@ -51,17 +53,17 @@ abstract class CRUDLController extends CRUDController
     }
 
     /**
-     * @param OrderInterface $order
+     * @param QueryInterface $query
      *
      * @return FormInterface
      */
-    protected function createOrderForm(OrderInterface $order)
+    protected function createOrderForm(QueryInterface $query)
     {
-        return $this->createForm(EmptyOrderForm::class, $order);
+        return $this->createForm(EmptyOrderForm::class, $query);
     }
 
     /**
-     * @return OrderInterface
+     * @return QueryInterface
      */
     protected function createOrder()
     {
@@ -79,22 +81,60 @@ abstract class CRUDLController extends CRUDController
     }
 
     /**
-     * @return Filter\QueryBuilder
+     * @param $builder
+     *
+     * @return FilterQueryBuilder
      */
-    protected function getFilterQueryBuilder()
+    private function getFilterQueryBuilder($builder)
     {
-        return new Filter\QueryBuilder($this->getEntityRepository());
+        return new FilterQueryBuilder($builder);
     }
 
     /**
-     * @param Request         $request
-     * @param FilterInterface $filter
-     * @param Pagination      $pagination
-     * @param OrderInterface  $order
+     * @param $builder
+     *
+     * @return OrderQueryBuilder
+     */
+    private function getOrderQueryBuilder($builder)
+    {
+        return new OrderQueryBuilder($builder);
+    }
+
+    /**
+     * @param $builder
+     *
+     * @return PaginationQueryBuilder
+     */
+    private function getPaginationQueryBuilder($builder)
+    {
+        return new PaginationQueryBuilder($builder);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getQueryEntityAlias()
+    {
+        return 'a';
+    }
+
+    /**
+     * @return int
+     */
+    protected function getCollectionMaxSize() : int
+    {
+        return 100;
+    }
+
+    /**
+     * @param Request                        $request
+     * @param QueryInterface $filter
+     * @param Pagination                     $pagination
+     * @param QueryInterface  $order
      *
      * @return JsonResponse
      */
-    protected function doList(Request $request, FilterInterface $filter, Pagination $pagination, OrderInterface $order)
+    protected function doList(Request $request, QueryInterface $filter, Pagination $pagination, QueryInterface $order)
     {
         $filterForm = $this->createFilterForm($filter);
         $paginationForm = $this->createForm(PaginationForm::class, $pagination);
@@ -109,11 +149,12 @@ abstract class CRUDLController extends CRUDController
             && ($paginationForm->isValid() || !$paginationForm->isSubmitted())
             && ($orderForm->isValid() || !$orderForm->isSubmitted())
         ) {
-            $builder = $this->getFilterQueryBuilder()
-                ->setFilter($filterForm->getData())
-                ->setPagination($paginationForm->getData())
-                ->setOrder($orderForm->getData())
-            ;
+            $alias = $this->getQueryEntityAlias();
+            $builder = $this->getEntityRepository()->createQueryBuilder($alias);
+
+            $this->getFilterQueryBuilder($builder)->setQuery($filterForm->getData());
+            $this->getOrderQueryBuilder($builder)->setQuery($orderForm->getData());
+            $paginationBuilder = $this->getPaginationQueryBuilder($builder)->setPagination($paginationForm->getData());
 
             $entities = $builder->getQuery()->getResult();
 
@@ -121,13 +162,14 @@ abstract class CRUDLController extends CRUDController
                 ->setTransformableCollection($entities, $this->createEntityTransformer());
 
             if ($this->isResponseIncludePagination()) {
-                $responseBuilder->setHeader(self::PAGINATION_TOTAL_SIZE, $builder->getTotalSize());
+                $responseBuilder->setHeader(self::PAGINATION_TOTAL_SIZE, $paginationBuilder->getTotalSize());
             }
 
             $response = $responseBuilder->build();
         } else {
             $response = $this->getResponseBuilder()
                 ->addErrorList(new FormErrorAdapter($filterForm->getErrors(true), ErrorCodes::VALIDATION_ERROR))
+                ->addErrorList(new FormErrorAdapter($orderForm->getErrors(true), ErrorCodes::VALIDATION_ERROR))
                 ->build(JsonResponse::HTTP_BAD_REQUEST);
         }
 

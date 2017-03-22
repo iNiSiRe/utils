@@ -2,7 +2,9 @@
 
 namespace PrivateDev\Utils\Filter\Model;
 
-class EmptyFilter extends AbstractFilter
+use PrivateDev\Utils\Builder\Query\AbstractQuery;
+
+class EmptyFilter extends AbstractQuery
 {
 
 }

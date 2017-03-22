@@ -2,100 +2,68 @@
 
 namespace PrivateDev\Utils\Builder;
 
-use PrivateDev\Utils\Filter\Model\FilterInterface;
-use PrivateDev\Utils\Order\OrderInterface;
+use PrivateDev\Utils\Filter\Model\EmptyData;
+use PrivateDev\Utils\Filter\Model\PartialMatchText;
+use PrivateDev\Utils\Filter\Model\Range;
+use PrivateDev\Utils\Builder\Query\QueryInterface;
 
-class QueryBuilder extends AbstractQueryBuilder
+class FilterQueryBuilder extends AbstractQueryBuilder
 {
     /**
-     * @param FilterInterface $filter
-     * @param string          $alias
-     *
-     * @return $this
-     */
-    public function setFilter(FilterInterface $filter, $alias = self::ALIAS)
-    {
-        $this->addFilter($filter, $filter->getRelationshipAlias());
-        $this->builder->setMaxResults($filter->getCollectionMaxSize());
-
-        return $this;
-    }
-
-    /**
-     * @param OrderInterface $order
-     * @param string         $alias
-     *
-     * @return $this
-     */
-    public function setOrder(OrderInterface $order, $alias = self::ALIAS)
-    {
-        $this->addOrder($order, $order->getRelationshipAlias());
-
-        return $this;
-    }
-
-    /**
-     * @param FilterInterface $filter
-     * @param                 $alias
-     */
-    protected function addFilter(FilterInterface $filter, $alias)
-    {
-        if (count($filter->getJoins()) > 0) {
-            foreach ($filter->getJoins() as $join) {
-                $this->builder->add('join', [$join], true);
-            }
-        }
-
-        foreach ($filter->getFilter() as $key => $value) {
-            $this->addCondition($key, $value, $alias);
-        }
-    }
-
-    /**
-     * @param OrderInterface $order
-     */
-    protected function addOrder(OrderInterface $order, $alias)
-    {
-        if (count($order->getJoins()) > 0) {
-            foreach ($order->getJoins() as $join) {
-                $this->builder->add('join', [$join], true);
-            }
-        }
-
-        foreach ($order->getOrder() as $key => $value) {
-            $this->addOrderCondition($key, $value, $alias);
-        }
-    }
-
-    /**
      * @param        $key
      * @param        $value
      * @param string $alias
      */
-    protected function addCondition($key, $value, $alias = self::ALIAS)
+    protected function addCondition($key, $value, $alias)
     {
-        if (is_object($value) && $value instanceof FilterInterface) {
-            $this->addFilter($value, $key);
-
+        if (is_object($value) && $value instanceof QueryInterface) {
+            $this->addQuery($value, $key);
             return;
         }
 
-        parent::addCondition($key, $value, $alias);
-    }
+        switch (true) {
+            // String, numeric, bool
+            case (is_string($value) || is_numeric($value) || is_bool($value)): {
+                $this->builder
+                    ->andWhere(sprintf('%1$s.%2$s = :%1$s_%3$s_value', $alias, $key, $this->createPlaceholder($key)))
+                    ->setParameter(sprintf('%s_%s_value', $alias, $this->createPlaceholder($key)), $value);
+            } break;
 
-    /**
-     * @param        $key
-     * @param        $value
-     * @param string $alias
-     */
-    protected function addOrderCondition($key, $value, $alias = self::ALIAS)
-    {
-        if (is_object($value) && $value instanceof OrderInterface) {
-            $this->addOrder($value, $key);
+            // DateTime
+            case ($value instanceof \DateTime): {
+                $this->builder
+                    ->andWhere(sprintf('%1$s.%2$s = :%1$s_%3$s_value', $alias, $key, $this->createPlaceholder($key)))
+                    ->setParameter(sprintf('%s_%s_value', $alias, $this->createPlaceholder($key)), $value);
+            } break;
 
-            return;
+            // Range
+            case (is_object($value) && $value instanceof Range): {
+
+                if ($value->getFrom()) {
+                    $this->builder
+                        ->andWhere(sprintf('%1$s.%2$s >= :%1$s_%3$s_from', $alias, $key, $this->createPlaceholder($key)))
+                        ->setParameter(sprintf('%s_%s_from', $alias, $this->createPlaceholder($key)), $value->getFrom());
+                }
+
+                if ($value->getTo()) {
+                    $this->builder
+                        ->andWhere(sprintf('%1$s.%2$s <= :%1$s_%3$s_to', $alias, $key, $this->createPlaceholder($key)))
+                        ->setParameter(sprintf('%s_%s_to', $alias, $this->createPlaceholder($key)), $value->getTo());
+                }
+            } break;
+
+            // Operator "LIKE"
+            case (is_object($value) && $value instanceof PartialMatchText): {
+                $this->builder
+                    ->andWhere(sprintf('%1$s.%2$s LIKE :%1$s_%3$s_value', $alias, $key, $this->createPlaceholder($key)))
+                    ->setParameter(sprintf('%s_%s_value', $alias, $this->createPlaceholder($key)), '%' . $value->getText() . '%');
+            } break;
+
+            // Empty
+            case (is_object($value) && $value instanceof EmptyData): {
+                $this->builder
+                    ->andWhere(sprintf('%1$s.%2$s IS NULL', $alias, $key));
+            }
         }
-
-        parent::addOrderCondition($key, $value, $alias);
     }
 }
