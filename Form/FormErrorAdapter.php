@@ -39,8 +39,15 @@ class FormErrorAdapter extends ErrorList implements ErrorListInterface
     public function __construct(FormErrorIterator $errorIterator, $validationErrorCode = ErrorCodes::VALIDATION_ERROR)
     {
         for ($i = 0; $i < $errorIterator->count(); $i++) {
-            $error = $errorIterator->offsetGet($i);
-            $this->add(new Error($error->getMessage(), $validationErrorCode, $this->collectOriginName($error->getOrigin())));
+                $error = $errorIterator->offsetGet($i);
+            $this->add(new Error(
+                $error->getMessage(),
+                $error->getMessageTemplate(),
+                $error->getMessageParameters(),
+                $error->getMessagePluralization(),
+                ($error->getCause() && $error->getCause()->getCode()) ? $error->getCause()->getCode() : md5($error->getMessageTemplate()),
+                $this->collectOriginName($error->getOrigin())
+            ));
         }
     }
 }
