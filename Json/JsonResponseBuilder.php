@@ -29,6 +29,7 @@ class JsonResponseBuilder
      * @var JsonResponse
      */
     protected $response;
+
     /**
      * @var RequestStack
      */
@@ -97,12 +98,17 @@ class JsonResponseBuilder
      */
     protected function formatError(ErrorInterface $error)
     {
-        if ($error->getCode() > 0) {
+        if ($error->getCode() != "") {
             $formatted['code'] = $error->getCode();
         }
 
         if ($error->getOrigin() != "") {
             $formatted['origin'] = $error->getOrigin();
+        }
+
+        if ($error->getTemplate() != "") {
+            $formatted['template'] = $error->getTemplate();
+            $formatted['plural'] = $error->getPlural();
         }
 
         $formatted['message'] = $error->getMessage();

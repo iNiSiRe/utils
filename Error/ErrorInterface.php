@@ -4,9 +4,28 @@ namespace PrivateDev\Utils\Error;
 
 interface ErrorInterface
 {
-    public function getCode() : int;
-    
+    /**
+     * @return string
+     */
+    public function getCode() : string ;
+
+    /**
+     * @return string
+     */
     public function getOrigin() : string;
-    
+
+    /**
+     * @return string
+     */
     public function getMessage() : string;
+
+    /**
+     * @return string
+     */
+    public function getTemplate();
+
+    /**
+     * @return int|null
+     */
+    public function getPlural();
 }
