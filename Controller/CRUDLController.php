@@ -165,7 +165,7 @@ abstract class CRUDLController extends CRUDController
                 $responseBuilder->setHeader(self::PAGINATION_TOTAL_SIZE, $paginationBuilder->getTotalSize());
             }
 
-            $response = $responseBuilder->build();
+            $response = $this->applyCacheOptions($responseBuilder->build());
         } else {
             $response = $this->getResponseBuilder()
                 ->addErrorList(new FormErrorAdapter($filterForm->getErrors(true), ErrorCodes::VALIDATION_ERROR))
