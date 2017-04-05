@@ -2,6 +2,7 @@
 
 namespace PrivateDev\Utils\Filter;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use PrivateDev\Utils\Filter\Model\EmptyData;
@@ -91,7 +92,14 @@ class QueryBuilder
             case (is_object($value) && $value instanceof EmptyData): {
                 $this->builder
                     ->andWhere(sprintf('%1$s.%2$s IS NULL', $alias, $key));
-            }
+            } break;
+
+            // ArrayCollection
+            case (is_object($value) && $value instanceof ArrayCollection): {
+                $this->builder
+                    ->andWhere(sprintf('%1$s.%2$s IN (:%1$s_%3$s_value)', $alias, $key, $this->createPlaceholder($key)))
+                    ->setParameter(sprintf('%s_%s_value', $alias, $this->createPlaceholder($key)), $value);
+            } break;
         }
     }
 
