@@ -2,6 +2,7 @@
 
 namespace PrivateDev\Utils\Builder;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use PrivateDev\Utils\Filter\Model\EmptyData;
 use PrivateDev\Utils\Filter\Model\PartialMatchText;
 use PrivateDev\Utils\Filter\Model\Range;
@@ -63,14 +64,14 @@ class FilterQueryBuilder extends AbstractQueryBuilder
             case (is_object($value) && $value instanceof EmptyData): {
                 $this->builder
                     ->andWhere(sprintf('%1$s.%2$s IS NULL', $alias, $key));
-            }
+            } break;
 
             // ArrayCollection
             case (is_object($value) && $value instanceof ArrayCollection): {
                 $this->builder
                     ->andWhere(sprintf('%1$s.%2$s IN (:%1$s_%3$s_value)', $alias, $key, $this->createPlaceholder($key)))
                     ->setParameter(sprintf('%s_%s_value', $alias, $this->createPlaceholder($key)), $value);
-            } break;
+            }
         }
     }
 }
