@@ -2,6 +2,7 @@
 
 namespace PrivateDev\Utils\Controller;
 
+use Doctrine\ORM\Query\Expr\Join;
 use PrivateDev\Utils\Builder\FilterQueryBuilder;
 use PrivateDev\Utils\Builder\OrderQueryBuilder;
 use PrivateDev\Utils\Builder\PaginationQueryBuilder;
@@ -154,6 +155,19 @@ abstract class CRUDLController extends CRUDController
 
             $this->getFilterQueryBuilder($builder)->setQuery($filterForm->getData());
             $this->getOrderQueryBuilder($builder)->setQuery($orderForm->getData());
+
+            // Statement 'select' collect
+            $select[] = $alias;
+            if (isset($builder->getDQLParts()['join'][$alias])) {
+                /** @var Join $join */
+                foreach ($builder->getDQLParts()['join'][$alias] as $join) {
+                    if ($join->getCondition() == null) {
+                        $select[] = $join->getAlias();
+                    }
+                }
+            }
+            $builder->select(implode(',', $select));
+
             $paginationBuilder = $this->getPaginationQueryBuilder($builder)->setPagination($paginationForm->getData());
 
             $entities = $builder->getQuery()->getResult();
@@ -168,8 +182,9 @@ abstract class CRUDLController extends CRUDController
             $response = $this->applyCacheOptions($responseBuilder->build());
         } else {
             $response = $this->getResponseBuilder()
-                ->addErrorList(new FormErrorAdapter($filterForm->getErrors(true), ErrorCodes::VALIDATION_ERROR))
-                ->addErrorList(new FormErrorAdapter($orderForm->getErrors(true), ErrorCodes::VALIDATION_ERROR))
+                ->addErrorList(new FormErrorAdapter($filterForm->getErrors(true)))
+                ->addErrorList(new FormErrorAdapter($orderForm->getErrors(true)))
+                ->addErrorList(new FormErrorAdapter($paginationForm->getErrors(true)))
                 ->build(JsonResponse::HTTP_BAD_REQUEST);
         }
 
