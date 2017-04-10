@@ -36,7 +36,7 @@ class PaginationQueryBuilder extends AbstractQueryBuilder
     public function getTotalSize()
     {
         $builder = clone $this->builder;
-        $builder->resetDQLPart('select');
+        $builder->resetDQLParts(['select', 'join', 'groupBy']);
 
         $size = $builder
             ->select(sprintf('COUNT(DISTINCT %s)', $builder->getRootAliases()[0]))

@@ -166,7 +166,10 @@ abstract class CRUDLController extends CRUDController
                     }
                 }
             }
-            $builder->select(implode(',', $select));
+            $builder
+                ->select(implode(',', $select))
+                ->groupBy($alias . '.id')
+            ;
 
             $paginationBuilder = $this->getPaginationQueryBuilder($builder)->setPagination($paginationForm->getData());
 
