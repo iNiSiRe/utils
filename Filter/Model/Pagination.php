@@ -7,18 +7,18 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Pagination
 {
     /**
-     * @Assert\Range(min="1", max="100")
+     * @Assert\Range(min="1", max="250")
      *
      * @var int
      */
-    protected $limit;
+    protected $limit = 250;
 
     /**
      * @Assert\Range(min="0")
      *
      * @var int
      */
-    protected $offset;
+    protected $offset = 0;
 
     /**
      * @return int
