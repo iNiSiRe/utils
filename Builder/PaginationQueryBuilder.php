@@ -39,7 +39,7 @@ class PaginationQueryBuilder extends AbstractQueryBuilder
         $builder->resetDQLPart('select');
 
         $size = $builder
-            ->select(sprintf('COUNT(%s)', $builder->getRootAliases()[0]))
+            ->select(sprintf('COUNT(DISTINCT %s)', $builder->getRootAliases()[0]))
             ->setFirstResult(null)
             ->setMaxResults(null)
             ->getQuery()
