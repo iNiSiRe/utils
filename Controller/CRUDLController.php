@@ -220,4 +220,12 @@ abstract class CRUDLController extends CRUDController
     {
         return false;
     }
+
+    /**
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    protected function createQueryBuilder()
+    {
+        return $this->getEntityRepository()->createQueryBuilder($this->getQueryEntityAlias());
+    }
 }
