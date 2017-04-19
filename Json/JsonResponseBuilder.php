@@ -109,6 +109,7 @@ class JsonResponseBuilder
         if ($error->getTemplate() != "") {
             $formatted['template'] = $error->getTemplate();
             $formatted['plural'] = $error->getPlural();
+            $formatted['parameters'] = $error->getParameters();
         }
 
         $formatted['message'] = $error->getMessage();

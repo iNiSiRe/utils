@@ -28,4 +28,9 @@ interface ErrorInterface
      * @return int|null
      */
     public function getPlural();
+
+    /**
+     * @return array
+     */
+    public function getParameters();
 }
