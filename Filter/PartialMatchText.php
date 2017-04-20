@@ -1,6 +1,6 @@
 <?php
 
-namespace PrivateDev\Utils\Filter\Model;
+namespace PrivateDev\Utils\Filter;
 
 class PartialMatchText
 {

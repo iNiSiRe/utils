@@ -2,7 +2,7 @@
 
 namespace PrivateDev\Utils\Filter\Form;
 
-class EmptyFilterForm extends AbstractFilterForm
+class EmptyFilterType extends AbstractFilterType
 {
 
 }

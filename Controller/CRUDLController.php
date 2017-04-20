@@ -6,13 +6,12 @@ use Doctrine\ORM\Query\Expr\Join;
 use PrivateDev\Utils\Builder\FilterQueryBuilder;
 use PrivateDev\Utils\Builder\OrderQueryBuilder;
 use PrivateDev\Utils\Builder\PaginationQueryBuilder;
-use PrivateDev\Utils\Error\ErrorCodes;
 use PrivateDev\Utils\Filter as Filter;
-use PrivateDev\Utils\Filter\Form\PaginationForm;
-use PrivateDev\Utils\Filter\Model\Pagination;
+use PrivateDev\Utils\Filter\Form\PaginationType;
+use PrivateDev\Utils\Filter\Pagination;
 use PrivateDev\Utils\Form\FormErrorAdapter;
 use PrivateDev\Utils\Order\Form\EmptyOrderForm;
-use PrivateDev\Utils\Order\Model\EmptyOrder;
+use PrivateDev\Utils\Order\EmptyOrder;
 use PrivateDev\Utils\Permission\Permissions;
 use PrivateDev\Utils\Builder\Query\QueryInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -34,7 +33,7 @@ abstract class CRUDLController extends CRUDController
      */
     protected function createFilterForm(QueryInterface $query)
     {
-        return $this->createForm(Filter\Form\EmptyFilterForm::class, $query);
+        return $this->createForm(Filter\Form\EmptyFilterType::class, $query);
     }
 
     /**
@@ -42,7 +41,7 @@ abstract class CRUDLController extends CRUDController
      */
     protected function createFilter()
     {
-        return new Filter\Model\EmptyFilter();
+        return new Filter\EmptyFilter();
     }
 
     /**
@@ -138,7 +137,7 @@ abstract class CRUDLController extends CRUDController
     protected function doList(Request $request, QueryInterface $filter, Pagination $pagination, QueryInterface $order)
     {
         $filterForm = $this->createFilterForm($filter);
-        $paginationForm = $this->createForm(PaginationForm::class, $pagination);
+        $paginationForm = $this->createForm(PaginationType::class, $pagination);
         $orderForm = $this->createOrderForm($order);
 
         $filterForm->handleRequest($request);

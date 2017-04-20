@@ -2,7 +2,7 @@
 
 namespace PrivateDev\Utils\Filter\Form;
 
-use PrivateDev\Utils\Filter\Model\PartialMatchText;
+use PrivateDev\Utils\Filter\PartialMatchText;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
