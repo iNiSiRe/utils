@@ -2,7 +2,7 @@
 
 namespace PrivateDev\Utils\Builder;
 
-use PrivateDev\Utils\Filter\Model\Pagination;
+use PrivateDev\Utils\Filter\Pagination;
 
 class PaginationQueryBuilder extends AbstractQueryBuilder
 {

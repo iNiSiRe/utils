@@ -3,9 +3,9 @@
 namespace PrivateDev\Utils\Builder;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use PrivateDev\Utils\Filter\Model\EmptyData;
-use PrivateDev\Utils\Filter\Model\PartialMatchText;
-use PrivateDev\Utils\Filter\Model\Range;
+use PrivateDev\Utils\Filter\EmptyData;
+use PrivateDev\Utils\Filter\PartialMatchText;
+use PrivateDev\Utils\Filter\Range;
 use PrivateDev\Utils\Builder\Query\QueryInterface;
 
 class FilterQueryBuilder extends AbstractQueryBuilder

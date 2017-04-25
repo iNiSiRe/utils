@@ -1,24 +1,20 @@
 <?php
 
-namespace PrivateDev\Utils\Filter\Form;
+namespace PrivateDev\Utils\Form;
 
-use PrivateDev\Utils\Filter\Range;
+use CommonBundle\Transformer\BooleanTransformer;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class NumberRangeType extends AbstractType
+class BooleanType extends AbstractType
 {
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder
-            ->add('from', NumberType::class)
-            ->add('to', NumberType::class)
-        ;
+        $builder->addViewTransformer(new BooleanTransformer());
     }
 
     /**
@@ -26,7 +22,6 @@ class NumberRangeType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(['data_class' => Range::class]);
+        $resolver->setDefaults(['compound' => false]);
     }
-
 }

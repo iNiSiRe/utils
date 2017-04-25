@@ -1,6 +1,6 @@
 <?php
 
-namespace PrivateDev\Utils\Order\Model;
+namespace PrivateDev\Utils\Order;
 
 use PrivateDev\Utils\Builder\Query\AbstractQuery;
 

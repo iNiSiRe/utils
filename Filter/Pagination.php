@@ -1,6 +1,6 @@
 <?php
 
-namespace PrivateDev\Utils\Filter\Model;
+namespace PrivateDev\Utils\Filter;
 
 use Symfony\Component\Validator\Constraints as Assert;
 

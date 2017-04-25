@@ -7,7 +7,7 @@ use Symfony\Component\Form\AbstractType;
 /**
  * Filter form type
  */
-abstract class AbstractFilterForm extends AbstractType
+abstract class AbstractFilterType extends AbstractType
 {
     public function getBlockPrefix()
     {

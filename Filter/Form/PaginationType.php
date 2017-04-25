@@ -2,13 +2,13 @@
 
 namespace PrivateDev\Utils\Filter\Form;
 
-use PrivateDev\Utils\Filter\Model\Pagination;
+use PrivateDev\Utils\Filter\Pagination;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class PaginationForm extends AbstractType
+class PaginationType extends AbstractType
 {
     /**
      * @inheritDoc

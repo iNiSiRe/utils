@@ -1,6 +1,6 @@
 <?php
 
-namespace PrivateDev\Utils\Filter\Model;
+namespace PrivateDev\Utils\Filter;
 
 use PrivateDev\Utils\Builder\Query\AbstractQuery;
 
