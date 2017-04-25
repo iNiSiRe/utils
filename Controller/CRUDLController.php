@@ -3,6 +3,7 @@
 namespace PrivateDev\Utils\Controller;
 
 use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\QueryBuilder;
 use PrivateDev\Utils\Builder\FilterQueryBuilder;
 use PrivateDev\Utils\Builder\OrderQueryBuilder;
 use PrivateDev\Utils\Builder\PaginationQueryBuilder;
@@ -127,6 +128,16 @@ abstract class CRUDLController extends CRUDController
     }
 
     /**
+     * @param $alias
+     *
+     * @return QueryBuilder
+     */
+    protected function createQueryBuilder($alias)
+    {
+        return $this->getEntityRepository()->createQueryBuilder($alias);
+    }
+
+    /**
      * @param Request                        $request
      * @param QueryInterface $filter
      * @param Pagination                     $pagination
@@ -150,7 +161,7 @@ abstract class CRUDLController extends CRUDController
             && ($orderForm->isValid() || !$orderForm->isSubmitted())
         ) {
             $alias = $this->getQueryEntityAlias();
-            $builder = $this->getEntityRepository()->createQueryBuilder($alias);
+            $builder = $this->createQueryBuilder($alias);
 
             $this->getFilterQueryBuilder($builder)->setQuery($filterForm->getData());
             $this->getOrderQueryBuilder($builder)->setQuery($orderForm->getData());
