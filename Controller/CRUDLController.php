@@ -4,6 +4,7 @@ namespace PrivateDev\Utils\Controller;
 
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use PrivateDev\Utils\Builder\FilterQueryBuilder;
 use PrivateDev\Utils\Builder\OrderQueryBuilder;
 use PrivateDev\Utils\Builder\PaginationQueryBuilder;
@@ -176,21 +177,20 @@ abstract class CRUDLController extends CRUDController
                     }
                 }
             }
-            $builder
-                ->select(implode(',', $select))
-                ->groupBy($alias . '.id')
-            ;
+            $builder->select(implode(',', $select));
 
+            $responseBuilder = $this->getResponseBuilder();
             $paginationBuilder = $this->getPaginationQueryBuilder($builder)->setPagination($paginationForm->getData());
 
-            $entities = $builder->getQuery()->getResult();
-
-            $responseBuilder = $this->getResponseBuilder()
-                ->setTransformableCollection($entities, $this->createEntityTransformer());
-
             if ($this->isResponseIncludePagination()) {
+                $paginator = new Paginator($builder->getQuery());
                 $responseBuilder->setHeader(self::PAGINATION_TOTAL_SIZE, $paginationBuilder->getTotalSize());
+                $entities = $paginator->getIterator()->getArrayCopy();
+            } else {
+                $entities = $builder->getQuery()->getResult();
             }
+
+            $responseBuilder->setTransformableCollection($entities, $this->createEntityTransformer());
 
             $response = $this->applyCacheOptions($responseBuilder->build());
         } else {
