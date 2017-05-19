@@ -2,6 +2,9 @@
 
 namespace PrivateDev\Utils\Order\Form;
 
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
 class DefaultOrderType extends AbstractOrderForm
 {
     /**
