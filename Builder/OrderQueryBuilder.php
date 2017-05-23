@@ -2,10 +2,19 @@
 
 namespace PrivateDev\Utils\Builder;
 
+use Doctrine\Common\Collections\Criteria;
 use PrivateDev\Utils\Builder\Query\QueryInterface;
 
 class OrderQueryBuilder extends AbstractQueryBuilder
 {
+    /**
+     * @var array
+     */
+    private static $criteria = [
+        Criteria::ASC,
+        Criteria::DESC
+    ];
+
     /**
      * @param        $key
      * @param        $value
@@ -19,7 +28,7 @@ class OrderQueryBuilder extends AbstractQueryBuilder
             return;
         }
 
-        if (is_string($value)) {
+        if (is_string($value) && in_array($value, self::$criteria)) {
             $this->builder->addOrderBy(sprintf('%s.%s', $alias, $key), $value);
         }
     }
