@@ -12,6 +12,6 @@
     }
   },
   "require": {
-    "league/fractal": "0.13.0"
+    "league/fractal": "~0.13"
   }
 }
