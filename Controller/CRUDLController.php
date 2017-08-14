@@ -182,12 +182,10 @@ abstract class CRUDLController extends CRUDController
             $responseBuilder = $this->getResponseBuilder();
             $paginationBuilder = $this->getPaginationQueryBuilder($builder)->setPagination($paginationForm->getData());
 
+            $paginator = new Paginator($builder->getQuery());
+            $entities = $paginator->getIterator()->getArrayCopy();
             if ($this->isResponseIncludePagination()) {
-                $paginator = new Paginator($builder->getQuery());
                 $responseBuilder->setHeader(self::PAGINATION_TOTAL_SIZE, $paginationBuilder->getTotalSize());
-                $entities = $paginator->getIterator()->getArrayCopy();
-            } else {
-                $entities = $builder->getQuery()->getResult();
             }
 
             $responseBuilder->setTransformableCollection($entities, $this->createEntityTransformer());
