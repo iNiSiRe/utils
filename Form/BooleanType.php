@@ -2,7 +2,7 @@
 
 namespace PrivateDev\Utils\Form;
 
-use CommonBundle\Transformer\BooleanTransformer;
+use PrivateDev\Utils\Form\Transformer\BooleanTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
