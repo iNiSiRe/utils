@@ -30,4 +30,24 @@ class ErrorList implements ErrorListInterface
     {
         return $this->errors;
     }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        $array = [];
+        foreach ($this->all() as $error) {
+            $array[] = [
+                'message' => $error->getMessage(),
+                'template' => $error->getTemplate(),
+                'plural' => $error->getPlural(),
+                'parameters' => $error->getParameters(),
+                'code' => $error->getCode(),
+                'origin' =>$error->getOrigin()
+            ];
+        }
+
+        return $array;
+    }
 }
