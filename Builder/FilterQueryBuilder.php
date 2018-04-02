@@ -87,7 +87,7 @@ class FilterQueryBuilder extends AbstractQueryBuilder
                 break;
 
             // FilterData
-            case (is_object($value) && $value instanceof FilterData):
+            case (is_object($value) && $value instanceof FilterData && !is_null($value->getValue())):
                 {
                     $operand1 = "{$alias}.{$key}";
 

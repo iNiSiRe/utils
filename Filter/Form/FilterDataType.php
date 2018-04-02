@@ -26,7 +26,7 @@ class FilterDataType extends AbstractType
                     FilterData::TYPE_SIMPLE_VALUE,
                     FilterData::TYPE_CONST
                 ],
-                'empty_data' => FilterData::TYPE_SIMPLE_VALUE
+                'empty_data' => (string) FilterData::TYPE_SIMPLE_VALUE
             ])
             ->add('condition', ChoiceType::class, [
                 'choices' => [
