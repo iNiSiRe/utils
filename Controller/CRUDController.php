@@ -195,11 +195,7 @@ abstract class CRUDController extends Controller
      */
     public function createAction(Request $request)
     {
-        $role = $this->getAccessRole(self::ACTION_CREATE);
-
-        if ($role && !$this->isGranted($role)) {
-            throw new AccessDeniedHttpException();
-        }
+        $this->checkAccess($request, self::ACTION_CREATE);
 
         $entity = $this->createEntity();
 
@@ -242,17 +238,14 @@ abstract class CRUDController extends Controller
      * @Route(path="/{id}")
      * @Method({"GET"})
      *
-     * @param $id
+     * @param Request $request
+     * @param         $id
      *
-     * @return Response
+     * @return JsonResponse
      */
-    public function readAction($id)
+    public function readAction(Request $request, $id)
     {
-        $role = $this->getAccessRole(self::ACTION_READ);
-
-        if ($role && !$this->isGranted($role)) {
-            throw new AccessDeniedHttpException();
-        }
+        $this->checkAccess($request, self::ACTION_READ);
 
         $entity = $this->getEntityRepository()->find($id);
 
@@ -274,11 +267,7 @@ abstract class CRUDController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
-        $role = $this->getAccessRole(self::ACTION_UPDATE);
-
-        if ($role && !$this->isGranted($role)) {
-            throw new AccessDeniedHttpException();
-        }
+        $this->checkAccess($request, self::ACTION_UPDATE);
 
         $entity = $this->getEntityRepository()->find($id);
 
@@ -311,17 +300,14 @@ abstract class CRUDController extends Controller
      * @Route("/{id}")
      * @Method({"DELETE"})
      *
-     * @param int $id
+     * @param Request $request
+     * @param int     $id
      *
      * @return JsonResponse
      */
-    public function deleteAction($id)
+    public function deleteAction(Request $request, $id)
     {
-        $role = $this->getAccessRole(self::ACTION_DELETE);
-
-        if ($role && !$this->isGranted($role)) {
-            throw new AccessDeniedHttpException();
-        }
+        $this->checkAccess($request, self::ACTION_DELETE);
 
         $entity = $this->getEntityRepository()->find($id);
 
@@ -330,5 +316,18 @@ abstract class CRUDController extends Controller
         }
 
         return $this->doDelete($entity);
+    }
+
+    /**
+     * @param Request $request
+     * @param         $action
+     */
+    protected function checkAccess(Request $request, $action)
+    {
+        $role = $this->getAccessRole($action);
+
+        if ($role && !$this->isGranted($role)) {
+            throw new AccessDeniedHttpException();
+        }
     }
 }

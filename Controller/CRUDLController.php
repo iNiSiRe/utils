@@ -212,11 +212,7 @@ abstract class CRUDLController extends CRUDController
      */
     public function listAction(Request $request)
     {
-        $role = $this->getAccessRole(self::ACTION_LIST);
-
-        if ($role && !$this->isGranted($role)) {
-            throw new AccessDeniedHttpException();
-        }
+        $this->checkAccess($request, self::ACTION_LIST);
 
         return $this->doList($request, $this->createFilter(), $this->createPagination(), $this->createOrder());
     }
