@@ -4,8 +4,6 @@ namespace PrivateDev\Utils\Filter\Form;
 
 use PrivateDev\Utils\Filter\FilterData;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\CallbackTransformer;
-use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -24,13 +22,15 @@ class FilterDataType extends AbstractType
             ->add('type', ChoiceType::class, [
                 'choices' => [
                     FilterData::TYPE_SIMPLE_VALUE,
-                    FilterData::TYPE_CONST
+                    FilterData::TYPE_CONST,
+                    FilterData::TYPE_ARRAY_VALUE,
                 ],
                 'empty_data' => (string) FilterData::TYPE_SIMPLE_VALUE
             ])
             ->add('condition', ChoiceType::class, [
                 'choices' => [
-                    FilterData::CONDITION_AND
+                    FilterData::CONDITION_AND,
+                    FilterData::CONDITION_IN,
                 ],
                 'empty_data' => (string) FilterData::CONDITION_AND
             ])

@@ -13,9 +13,11 @@ class FilterData
 {
     const TYPE_SIMPLE_VALUE = 1;
     const TYPE_CONST = 2;
+    const TYPE_ARRAY_VALUE = 3;
 
     const CONDITION_AND = 1;
     const CONDITION_OR = 2;
+    const CONDITION_IN = 3;
 
     const OPERATOR_EQUAL = 1;
     const OPERATOR_NOT_EQUAL = 2;
