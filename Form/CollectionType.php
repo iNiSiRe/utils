@@ -15,6 +15,8 @@ class CollectionType extends BaseCollectionType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        parent::buildForm($builder, $options);
+
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
 
             $data = $event->getData();
