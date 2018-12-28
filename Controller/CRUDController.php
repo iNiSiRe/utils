@@ -27,6 +27,15 @@ abstract class CRUDController extends Controller
     const ACTION_UPDATE = 3;
     const ACTION_DELETE = 4;
 
+    const GROUP_CREATE = 'CREATE';
+    const GROUP_UPDATE = 'UPDATE';
+
+    const GROUP_MAP = [
+        Request::METHOD_POST => self::GROUP_CREATE,
+        Request::METHOD_PATCH => self::GROUP_UPDATE,
+        Request::METHOD_PUT => self::GROUP_UPDATE
+    ];
+
     /**
      * Get repository of the Entity
      *
@@ -134,7 +143,11 @@ abstract class CRUDController extends Controller
 
         $responseBuilder = $this->getResponseBuilder();
 
-        $form = $this->createEntityForm($entity, ['method' => $request->getMethod()]);
+        $form = $this->createEntityForm($entity, [
+            'method' => $request->getMethod(),
+            'validation_groups' => ['Default', self::GROUP_MAP[$request->getMethod()]]
+        ]);
+
         $form->handleRequest($request);
 
         if ($form->isValid()) {
@@ -142,7 +155,7 @@ abstract class CRUDController extends Controller
 
             if ($entity instanceof TranslatableEntityInterface) {
                 $language = $request->getPreferredLanguage();
-                
+
                 $translation = $entity->getTranslation() ? $entity->getTranslation() : new Translation();
                 $translation->setEntityClass(get_class($entity));
 

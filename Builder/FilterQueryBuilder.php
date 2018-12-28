@@ -98,8 +98,21 @@ class FilterQueryBuilder extends AbstractQueryBuilder
 
                         $operand2 = 'NULL';
 
+                        $this->builder->andWhere("{$operand1} {$operator} {$operand2}");
+                    } elseif ($value->getType() == FilterData::TYPE_ARRAY_VALUE && $value->getCondition() == FilterData::CONDITION_IN) {
+                        if (!is_array($value->getValue())) {
+                            return;
+                        }
+
+                        $operator = $value->getOperator() == FilterData::OPERATOR_EQUAL
+                            ? 'IN'
+                            : 'NOT IN';
+
+                        $operand2 = "{$alias}_{$this->createPlaceholder($key)}_value";
+
                         $this->builder
-                            ->andWhere("{$operand1} {$operator} {$operand2}");
+                            ->andWhere("{$operand1} {$operator} (:{$operand2})")
+                            ->setParameter($operand2, $value->getValue());
                     } else {
                         $operator = $value->getOperator() == FilterData::OPERATOR_EQUAL
                             ? '='
