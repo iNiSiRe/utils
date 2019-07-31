@@ -10,13 +10,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Swagger\Annotations\Definition;
 use Swagger\Annotations\Property;
 
-/**
- * @Definition(
- *     definition="Filter/DateRange",
- *     @Property(property="from", type="string", format="date-time"),
- *     @Property(property="to", type="string", format="date-time")
- * )
- */
 class DateRangeType extends DateTimeRangeType
 {
     /**
@@ -44,14 +37,6 @@ class DateRangeType extends DateTimeRangeType
             'method' => 'get',
             'data_class' => DateRange::class
         ]);
-    }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'period';
     }
 
     /**
