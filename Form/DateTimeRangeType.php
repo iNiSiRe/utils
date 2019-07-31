@@ -7,16 +7,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Swagger\Annotations\Definition;
-use Swagger\Annotations\Property;
 
-/**
- * @Definition(
- *     definition="Filter/DateTimeRange",
- *     @Property(property="from", type="string", format="date-time"),
- *     @Property(property="to", type="string", format="date-time")
- * )
- */
 class DateTimeRangeType extends AbstractType
 {
     /**
@@ -43,5 +34,13 @@ class DateTimeRangeType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Range::class
         ]);
+    }
+
+    /**
+     * @return string
+     */
+    public function getBlockPrefix()
+    {
+        return 'period';
     }
 }
