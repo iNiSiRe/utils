@@ -2,6 +2,7 @@
 
 namespace PrivateDev\Utils\Controller;
 
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -177,12 +178,16 @@ abstract class CRUDLController extends CRUDController
                     }
                 }
             }
-            $builder->select(implode(',', $select));
+
+            $builder
+                ->select(implode(',', $select))
+                // USE `GROUP BY` TO AVOID `DISTINCT` USING
+                ->groupBy(sprintf('%s.%s', $alias, 'id'));
 
             $responseBuilder = $this->getResponseBuilder();
             $paginationBuilder = $this->getPaginationQueryBuilder($builder)->setPagination($paginationForm->getData());
 
-            $paginator = new Paginator($builder->getQuery());
+            $paginator = new Paginator($builder->getQuery(), false);
             $entities = $paginator->getIterator()->getArrayCopy();
             if ($this->isResponseIncludePagination()) {
                 $responseBuilder->setHeader(self::PAGINATION_TOTAL_SIZE, $paginationBuilder->getTotalSize());
