@@ -179,10 +179,7 @@ abstract class CRUDLController extends CRUDController
                 }
             }
 
-            $builder
-                ->select(implode(',', $select))
-                // USE `GROUP BY` TO AVOID `DISTINCT` USING
-                ->groupBy(sprintf('%s.%s', $alias, 'id'));
+            $builder->select(implode(',', $select));
 
             $responseBuilder = $this->getResponseBuilder();
             $paginationBuilder = $this->getPaginationQueryBuilder($builder)->setPagination($paginationForm->getData());
