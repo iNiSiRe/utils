@@ -2,10 +2,8 @@
 
 namespace PrivateDev\Utils\Controller;
 
-use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use PrivateDev\Utils\Builder\FilterQueryBuilder;
 use PrivateDev\Utils\Builder\OrderQueryBuilder;
 use PrivateDev\Utils\Builder\PaginationQueryBuilder;
@@ -15,6 +13,7 @@ use PrivateDev\Utils\Filter\Pagination;
 use PrivateDev\Utils\Form\FormErrorAdapter;
 use PrivateDev\Utils\Order\Form\EmptyOrderForm;
 use PrivateDev\Utils\Order\EmptyOrder;
+use PrivateDev\Utils\ORM\Paginator;
 use PrivateDev\Utils\Permission\Permissions;
 use PrivateDev\Utils\Builder\Query\QueryInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -173,7 +172,7 @@ abstract class CRUDLController extends CRUDController
             if (isset($builder->getDQLParts()['join'][$alias])) {
                 /** @var Join $join */
                 foreach ($builder->getDQLParts()['join'][$alias] as $join) {
-                    if ($join->getCondition() == null) {
+                    if ($join->getCondition() == null && !in_array($join->getAlias(), $select)) {
                         $select[] = $join->getAlias();
                     }
                 }
@@ -184,7 +183,7 @@ abstract class CRUDLController extends CRUDController
             $responseBuilder = $this->getResponseBuilder();
             $paginationBuilder = $this->getPaginationQueryBuilder($builder)->setPagination($paginationForm->getData());
 
-            $paginator = new Paginator($builder->getQuery(), false);
+            $paginator = new Paginator($builder);
             $entities = $paginator->getIterator()->getArrayCopy();
             if ($this->isResponseIncludePagination()) {
                 $responseBuilder->setHeader(self::PAGINATION_TOTAL_SIZE, $paginationBuilder->getTotalSize());
