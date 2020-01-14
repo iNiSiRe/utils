@@ -9,7 +9,7 @@ class BalanceFormat
      * https://bio-gram.myjetbrains.com/youtrack/issue/BG-4223
      * https://bio-gram.myjetbrains.com/youtrack/issue/BG-4976
      */
-    const CORRECTION_FLOAT_VALUE = 0.00000000001;
+    const CORRECTION_FLOAT_VALUE = 0.0000000001;
 
     const PRECISIONS_MAP = [
         self::CODE_USD => 2,
@@ -67,7 +67,7 @@ class BalanceFormat
     static function toISO(float $balance, string $currency = self::CODE_USD) : int
     {
         return (int) (
-            $balance * pow(10, self::PRECISIONS_MAP[$currency] ?? self::PRECISIONS_MAP[self::CODE_USD]) + self::CORRECTION_FLOAT_VALUE
+            (self::CORRECTION_FLOAT_VALUE + $balance) * pow(10, self::PRECISIONS_MAP[$currency] ?? self::PRECISIONS_MAP[self::CODE_USD])
         );
     }
 }
