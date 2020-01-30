@@ -16,8 +16,7 @@ use PrivateDev\Utils\Order\EmptyOrder;
 use PrivateDev\Utils\ORM\Paginator;
 use PrivateDev\Utils\Permission\Permissions;
 use PrivateDev\Utils\Builder\Query\QueryInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -204,8 +203,7 @@ abstract class CRUDLController extends CRUDController
     }
 
     /**
-     * @Route()
-     * @Method({"GET"})
+     * @Route(methods={"GET"})
      *
      * @param Request $request
      *
