@@ -111,7 +111,7 @@ abstract class CRUDController extends AbstractController
      */
     protected function save($entity)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $em->persist($entity);
         $em->flush();
     }
@@ -151,7 +151,7 @@ abstract class CRUDController extends AbstractController
 
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $entity = $form->getData();
 
             if ($entity instanceof TranslatableEntityInterface) {
@@ -200,8 +200,7 @@ abstract class CRUDController extends AbstractController
     }
 
     /**
-     * @Route()
-     * @Method({"POST"})
+     * @Route(methods={"POST"})
      *
      * @param Request $request
      *
@@ -249,8 +248,7 @@ abstract class CRUDController extends AbstractController
     }
 
     /**
-     * @Route(path="/{id}")
-     * @Method({"GET"})
+     * @Route(path="/{id}", methods={"GET"}, requirements={"id"="\d+"})
      *
      * @param Request $request
      * @param         $id
@@ -271,8 +269,7 @@ abstract class CRUDController extends AbstractController
     }
 
     /**
-     * @Route(path="/{id}")
-     * @Method({"PUT", "PATCH"})
+     * @Route(path="/{id}", methods={"PUT", "PATCH"}, requirements={"id"="\d+"})
      *
      * @param Request $request
      * @param int     $id
@@ -311,8 +308,7 @@ abstract class CRUDController extends AbstractController
     }
 
     /**
-     * @Route("/{id}")
-     * @Method({"DELETE"})
+     * @Route(path="/{id}", methods={"DELETE"}, requirements={"id"="\d+"})
      *
      * @param Request $request
      * @param int     $id

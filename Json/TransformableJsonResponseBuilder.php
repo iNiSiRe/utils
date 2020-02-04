@@ -33,8 +33,8 @@ class TransformableJsonResponseBuilder extends JsonResponseBuilder
     /**
      * @param $object
      * @param TransformerAbstract $transformer
+     * 
      * @return TransformableJsonResponseBuilder
-     * @throws \Exception
      */
     public function setTransformableItem($object, TransformerAbstract $transformer)
     {

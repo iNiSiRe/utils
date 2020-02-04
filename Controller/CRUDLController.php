@@ -157,9 +157,9 @@ abstract class CRUDLController extends CRUDController
         $orderForm->handleRequest($request);
 
         if (
-            ($filterForm->isValid() || !$filterForm->isSubmitted())
-            && ($paginationForm->isValid() || !$paginationForm->isSubmitted())
-            && ($orderForm->isValid() || !$orderForm->isSubmitted())
+            (!$filterForm->isSubmitted() || ($filterForm->isSubmitted() && $filterForm->isValid()))
+            && (!$paginationForm->isSubmitted() || ($paginationForm->isSubmitted() && $paginationForm->isValid()))
+            && (!$orderForm->isSubmitted() || ($orderForm->isSubmitted() && $orderForm->isValid()))
         ) {
             $alias = $this->getQueryEntityAlias();
             $builder = $this->createQueryBuilder($alias);
