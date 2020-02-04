@@ -9,8 +9,7 @@ use PrivateDev\Utils\Form\FormErrorAdapter;
 use PrivateDev\Utils\Fractal\TransformerAbstract;
 use PrivateDev\Utils\Json\TransformableJsonResponseBuilder;
 use PrivateDev\Utils\Permission\Permissions;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormInterface;
@@ -32,9 +31,9 @@ abstract class CRUDController extends AbstractController
     const GROUP_UPDATE = 'UPDATE';
 
     const GROUP_MAP = [
-        Request::METHOD_POST => self::GROUP_CREATE,
+        Request::METHOD_POST  => self::GROUP_CREATE,
         Request::METHOD_PATCH => self::GROUP_UPDATE,
-        Request::METHOD_PUT => self::GROUP_UPDATE
+        Request::METHOD_PUT   => self::GROUP_UPDATE,
     ];
 
     /**
@@ -73,7 +72,6 @@ abstract class CRUDController extends AbstractController
      */
     abstract protected function getResponseBuilder();
 
-
     /**
      * Roles for actions
      *
@@ -88,7 +86,7 @@ abstract class CRUDController extends AbstractController
             self::ACTION_CREATE => Permissions::EMPTY,
             self::ACTION_READ   => Permissions::EMPTY,
             self::ACTION_UPDATE => Permissions::EMPTY,
-            self::ACTION_DELETE => Permissions::EMPTY
+            self::ACTION_DELETE => Permissions::EMPTY,
         ];
     }
 
@@ -145,8 +143,8 @@ abstract class CRUDController extends AbstractController
         $responseBuilder = $this->getResponseBuilder();
 
         $form = $this->createEntityForm($entity, [
-            'method' => $request->getMethod(),
-            'validation_groups' => ['Default', self::GROUP_MAP[$request->getMethod()]]
+            'method'            => $request->getMethod(),
+            'validation_groups' => ['Default', self::GROUP_MAP[$request->getMethod()]],
         ]);
 
         $form->handleRequest($request);
@@ -235,6 +233,8 @@ abstract class CRUDController extends AbstractController
      * @param $entity
      *
      * @return JsonResponse
+     *
+     * @throws \Exception
      */
     protected function doRead($entity)
     {
@@ -254,6 +254,8 @@ abstract class CRUDController extends AbstractController
      * @param         $id
      *
      * @return JsonResponse
+     *
+     * @throws \Exception
      */
     public function readAction(Request $request, $id)
     {
