@@ -300,7 +300,7 @@ abstract class CRUDController extends AbstractController
     {
         $this->postEntityLoadCheckAccess(self::ACTION_DELETE, $entity);
 
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $em->remove($entity);
         $em->flush($entity);
 
