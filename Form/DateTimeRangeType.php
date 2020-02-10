@@ -16,12 +16,14 @@ class DateTimeRangeType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('from', DateTimeType::class, [
+            ->add('from', \PrivateDev\Utils\Form\DateTimeType::class, [
                 'widget' => 'single_text',
+                'html5' => false,
                 'format' => DateTimeType::HTML5_FORMAT
             ])
-            ->add('to', DateTimeType::class, [
+            ->add('to', \PrivateDev\Utils\Form\DateTimeType::class, [
                 'widget' => 'single_text',
+                'html5' => false,
                 'format' => DateTimeType::HTML5_FORMAT
             ]);
     }
