@@ -302,7 +302,7 @@ abstract class CRUDController extends AbstractController
 
         $em = $this->getDoctrine()->getManager();
         $em->remove($entity);
-        $em->flush($entity);
+        $em->flush();
 
         return $this
             ->getResponseBuilder()
