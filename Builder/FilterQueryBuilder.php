@@ -19,7 +19,7 @@ class FilterQueryBuilder extends AbstractQueryBuilder
     protected function addCondition($key, $value, $alias)
     {
         if (is_object($value) && $value instanceof QueryInterface) {
-            $this->addQuery($value, $key);
+            $this->addQuery($value, "{$alias}.{$key}");
             return;
         }
 
