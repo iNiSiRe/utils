@@ -40,7 +40,7 @@ class FilterData
     private $operator = self::OPERATOR_EQUAL;
 
     /**
-     * @var string
+     * @var mixed
      */
     private $value;
 
@@ -73,7 +73,7 @@ class FilterData
     }
 
     /**
-     * @param string $value
+     * @param mixed $value
      *
      * @return FilterData
      */
