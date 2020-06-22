@@ -19,7 +19,7 @@ class FilterQueryBuilder extends AbstractQueryBuilder
     protected function addCondition($key, $value, $alias)
     {
         if (is_object($value) && $value instanceof QueryInterface) {
-            $this->addQuery($value, "{$alias}.{$key}");
+            $this->addQuery($value, $key);
             return;
         }
 
@@ -114,11 +114,31 @@ class FilterQueryBuilder extends AbstractQueryBuilder
                             ->andWhere("{$operand1} {$operator} (:{$operand2})")
                             ->setParameter($operand2, $value->getValue());
                     } else {
-                        $operator = $value->getOperator() == FilterData::OPERATOR_EQUAL
-                            ? '='
-                            : '!=';
+                        switch ($value->getOperator()) {
+                            case FilterData::OPERATOR_EQUAL:
+                                $operator = '=';
+                                break;
+                            case FilterData::OPERATOR_NOT_EQUAL:
+                                $operator = '!=';
+                                break;
+                            case FilterData::OPERATOR_GREATER_THAN:
+                                $operator = '>';
+                                break;
+                            case FilterData::OPERATOR_GREATER_THAN_OR_EQUAL:
+                                $operator = '>=';
+                                break;
+                            case FilterData::OPERATOR_LESS_THAN:
+                                $operator = '<';
+                                break;
+                            case FilterData::OPERATOR_LESS_THAN_OR_EQUAL:
+                                $operator = '<=';
+                                break;
+                            default:
+                                $operator = FilterData::OPERATOR_EQUAL;
+                                break;
+                        }
 
-                        $operand2 = "{$alias}_{$this->createPlaceholder($key)}_value";
+                        $operand2 = "{$this->createPlaceholder($operand1)}_value";
 
                         $this->builder
                             ->andWhere("{$operand1} {$operator} :{$operand2}")

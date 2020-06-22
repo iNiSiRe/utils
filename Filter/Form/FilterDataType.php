@@ -39,7 +39,11 @@ class FilterDataType extends AbstractType
             ->add('operator', ChoiceType::class, [
                 'choices' => [
                     FilterData::OPERATOR_EQUAL,
-                    FilterData::OPERATOR_NOT_EQUAL
+                    FilterData::OPERATOR_NOT_EQUAL,
+                    FilterData::OPERATOR_GREATER_THAN,
+                    FilterData::OPERATOR_GREATER_THAN_OR_EQUAL,
+                    FilterData::OPERATOR_LESS_THAN,
+                    FilterData::OPERATOR_LESS_THAN_OR_EQUAL,
                 ],
                 'empty_data' => (string) FilterData::OPERATOR_EQUAL
             ]);

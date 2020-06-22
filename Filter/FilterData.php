@@ -21,6 +21,10 @@ class FilterData
 
     const OPERATOR_EQUAL = 1;
     const OPERATOR_NOT_EQUAL = 2;
+    const OPERATOR_GREATER_THAN = 3;
+    const OPERATOR_GREATER_THAN_OR_EQUAL = 4;
+    const OPERATOR_LESS_THAN = 5;
+    const OPERATOR_LESS_THAN_OR_EQUAL = 6;
 
     const CONST_VALUE_NULL = 1;
 
