@@ -51,7 +51,12 @@ class DateRangeType extends DateTimeRangeType
         /** @var DateRange $period */
         $period = $formEvent->getData();
 
-        $period->getFrom()->setTime(0, 0, 0);
-        $period->getTo()->setTime(23, 59, 59);
+        if ($from = $period->getFrom()) {
+            $from->setTime(0, 0, 0);
+        }
+
+        if ($to = $period->getTo()) {
+            $to->setTime(23, 59, 59);
+        }
     }
 }
