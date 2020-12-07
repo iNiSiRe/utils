@@ -22,22 +22,22 @@ class FilterDataType extends AbstractType
     {
         $builder
             ->add('type', ChoiceType::class, [
-                'choices' => [
+                'choices'    => [
                     FilterData::TYPE_SIMPLE_VALUE,
                     FilterData::TYPE_CONST,
                     FilterData::TYPE_ARRAY_VALUE,
                 ],
-                'empty_data' => (string) FilterData::TYPE_SIMPLE_VALUE
+                'empty_data' => (string) FilterData::TYPE_SIMPLE_VALUE,
             ])
             ->add('condition', ChoiceType::class, [
-                'choices' => [
+                'choices'    => [
                     FilterData::CONDITION_AND,
                     FilterData::CONDITION_IN,
                 ],
-                'empty_data' => (string) FilterData::CONDITION_AND
+                'empty_data' => (string) FilterData::CONDITION_AND,
             ])
             ->add('operator', ChoiceType::class, [
-                'choices' => [
+                'choices'    => [
                     FilterData::OPERATOR_EQUAL,
                     FilterData::OPERATOR_NOT_EQUAL,
                     FilterData::OPERATOR_GREATER_THAN,
@@ -45,7 +45,7 @@ class FilterDataType extends AbstractType
                     FilterData::OPERATOR_LESS_THAN,
                     FilterData::OPERATOR_LESS_THAN_OR_EQUAL,
                 ],
-                'empty_data' => (string) FilterData::OPERATOR_EQUAL
+                'empty_data' => (string) FilterData::OPERATOR_EQUAL,
             ]);
 
         $builder->get('type')->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
@@ -60,11 +60,14 @@ class FilterDataType extends AbstractType
 
                 case FilterData::TYPE_ARRAY_VALUE:
                     $type = CollectionType::class;
-                    $options = ['allow_add' => true];
+                    $options = [
+                        'allow_add' => true,
+                        'entry_type' => $event->getForm()->getParent()->getConfig()->getOption('entry_type')
+                    ];
                     break;
 
                 default:
-                    $type = TextType::class;
+                    $type = $event->getForm()->getParent()->getConfig()->getOption('entry_type');
                     break;
             }
 
@@ -83,7 +86,7 @@ class FilterDataType extends AbstractType
 
             if (is_string($data)) {
                 $event->setData([
-                    'value' => $data
+                    'value' => $data,
                 ]);
             }
 
@@ -95,6 +98,9 @@ class FilterDataType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefault('data_class', FilterData::class);
+        $resolver->setDefaults([
+            'data_class' => FilterData::class,
+            'entry_type' => TextType::class,
+        ]);
     }
 }
