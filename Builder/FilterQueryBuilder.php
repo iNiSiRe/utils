@@ -146,6 +146,15 @@ class FilterQueryBuilder extends AbstractQueryBuilder
                     }
                 }
                 break;
+
+            // array
+            case (is_array($value)):
+            {
+                $this->builder
+                    ->andWhere(sprintf('%1$s.%2$s IN (:%1$s_%3$s_value)', $alias, $key, $this->createPlaceholder($key)))
+                    ->setParameter(sprintf('%s_%s_value', $alias, $this->createPlaceholder($key)), $value);
+            }
+            break;
         }
     }
 }

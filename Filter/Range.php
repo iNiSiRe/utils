@@ -15,6 +15,16 @@ class Range
     protected $to;
 
     /**
+     * @param $from
+     * @param $to
+     */
+    public function __construct($from, $to)
+    {
+        $this->from = $from;
+        $this->to = $to;
+    }
+
+    /**
      * @return mixed
      */
     public function getFrom()
