@@ -18,7 +18,7 @@ class Range
      * @param $from
      * @param $to
      */
-    public function __construct($from, $to)
+    public function __construct($from = null, $to = null)
     {
         $this->from = $from;
         $this->to = $to;
