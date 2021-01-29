@@ -188,7 +188,7 @@ abstract class CRUDLController extends CRUDController
                 $responseBuilder->setHeader(self::PAGINATION_TOTAL_SIZE, $paginationBuilder->getTotalSize());
             }
 
-            $responseBuilder->setTransformableCollection($entities, $this->createEntityTransformer());
+            $responseBuilder->setTransformableCollection($entities, $this->createEntityTransformerForAction(self::ACTION_LIST));
 
             $response = $this->applyCacheOptions($responseBuilder->build());
         } else {

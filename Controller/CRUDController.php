@@ -91,6 +91,14 @@ abstract class CRUDController extends AbstractController
     }
 
     /**
+     * @return TransformerAbstract
+     */
+    protected function createEntityTransformerForAction(string $action)
+    {
+        return $this->createEntityTransformer();
+    }
+
+    /**
      * @param int $action
      *
      * @return string|null
@@ -172,7 +180,7 @@ abstract class CRUDController extends AbstractController
                 $payload = $this->onUpdateSuccess($entity);
             }
 
-            $responseBuilder->setTransformableItem($entity, $this->createEntityTransformer());
+            $responseBuilder->setTransformableItem($entity, $this->createEntityTransformerForAction(self::ACTION_UPDATE));
 
             if ($payload !== null) {
                 $responseBuilder->setData('payload', $payload);
@@ -241,7 +249,7 @@ abstract class CRUDController extends AbstractController
         $this->postEntityLoadCheckAccess(self::ACTION_READ, $entity);
 
         $response = $this->getResponseBuilder()
-            ->setTransformableItem($entity, $this->createEntityTransformer())
+            ->setTransformableItem($entity, $this->createEntityTransformerForAction(self::ACTION_READ))
             ->build();
 
         return $this->applyCacheOptions($response);
