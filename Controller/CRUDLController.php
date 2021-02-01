@@ -86,7 +86,7 @@ abstract class CRUDLController extends CRUDController
      *
      * @return FilterQueryBuilder
      */
-    private function getFilterQueryBuilder($builder)
+    protected function getFilterQueryBuilder($builder)
     {
         return new FilterQueryBuilder($builder);
     }
@@ -96,7 +96,7 @@ abstract class CRUDLController extends CRUDController
      *
      * @return OrderQueryBuilder
      */
-    private function getOrderQueryBuilder($builder)
+    protected function getOrderQueryBuilder($builder)
     {
         return new OrderQueryBuilder($builder);
     }
@@ -106,7 +106,7 @@ abstract class CRUDLController extends CRUDController
      *
      * @return PaginationQueryBuilder
      */
-    private function getPaginationQueryBuilder($builder)
+    protected function getPaginationQueryBuilder($builder)
     {
         return new PaginationQueryBuilder($builder);
     }

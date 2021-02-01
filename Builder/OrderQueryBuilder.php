@@ -10,7 +10,7 @@ class OrderQueryBuilder extends AbstractQueryBuilder
     /**
      * @var array
      */
-    private static $criteria = [
+    protected static $criteria = [
         Criteria::ASC,
         Criteria::DESC
     ];
