@@ -18,6 +18,12 @@ class BalanceFormat
         self::CODE_UAH => 2,
         self::CODE_KZT => 2,
         self::CODE_IDR => 2,
+        self::CODE_THB => 2,
+        self::CODE_INR => 2,
+        self::CODE_BRL => 2,
+        self::CODE_TRY => 2,
+        self::CODE_VND => 0,
+        self::CODE_JPY => 0,
 
         // Crypto
         self::CODE_BTC => 8,
@@ -35,6 +41,12 @@ class BalanceFormat
     const CODE_UAH = 'UAH';
     const CODE_KZT = 'KZT';
     const CODE_IDR = 'IDR';
+    const CODE_THB = 'THB';
+    const CODE_INR = 'INR';
+    const CODE_VND = 'VND';
+    const CODE_BRL = 'BRL';
+    const CODE_TRY = 'TRY';
+    const CODE_JPY = 'JPY';
 
     // Crypto
     const CODE_BTC = 'BTC';
@@ -51,9 +63,13 @@ class BalanceFormat
      *
      * @return float
      */
-    static public function toNative(int $isoBalance, string $currency = self::CODE_USD) : float
+    static public function toNative($isoBalance, string $currency = self::CODE_USD) : float
     {
         $precision = self::PRECISIONS_MAP[$currency] ?? self::PRECISIONS_MAP[self::CODE_USD];
+
+        if ($precision === 0) {
+            return $isoBalance;
+        }
 
         return round($isoBalance / pow(10, $precision), $precision);
     }
@@ -64,10 +80,16 @@ class BalanceFormat
      *
      * @return int
      */
-    static function toISO(float $balance, string $currency = self::CODE_USD) : int
+    static function toISO($balance, string $currency = self::CODE_USD) : int
     {
+        $precision = self::PRECISIONS_MAP[$currency] ?? self::PRECISIONS_MAP[self::CODE_USD];
+
+        if ($precision === 0) {
+            return $balance;
+        }
+
         return (int) (
-            (self::CORRECTION_FLOAT_VALUE + $balance) * pow(10, self::PRECISIONS_MAP[$currency] ?? self::PRECISIONS_MAP[self::CODE_USD])
+            (self::CORRECTION_FLOAT_VALUE + $balance) * pow(10, $precision)
         );
     }
 }
