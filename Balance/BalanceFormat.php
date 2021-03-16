@@ -63,13 +63,9 @@ class BalanceFormat
      *
      * @return float
      */
-    static public function toNative($isoBalance, string $currency = self::CODE_USD) : float
+    static public function toNative(int $isoBalance, string $currency = self::CODE_USD) : float
     {
         $precision = self::PRECISIONS_MAP[$currency] ?? self::PRECISIONS_MAP[self::CODE_USD];
-
-        if ($precision === 0) {
-            return $isoBalance;
-        }
 
         return round($isoBalance / pow(10, $precision), $precision);
     }
@@ -80,13 +76,9 @@ class BalanceFormat
      *
      * @return int
      */
-    static function toISO($balance, string $currency = self::CODE_USD) : int
+    static function toISO(float $balance, string $currency = self::CODE_USD) : int
     {
         $precision = self::PRECISIONS_MAP[$currency] ?? self::PRECISIONS_MAP[self::CODE_USD];
-
-        if ($precision === 0) {
-            return $balance;
-        }
 
         return (int) (
             (self::CORRECTION_FLOAT_VALUE + $balance) * pow(10, $precision)
