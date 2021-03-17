@@ -12,6 +12,7 @@
     }
   },
   "require": {
-    "league/fractal": "~0.13"
+    "league/fractal": "~0.13",
+    "ext-bcmath": "*"
   }
 }
