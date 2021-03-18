@@ -4,6 +4,13 @@ namespace PrivateDev\Utils\Balance;
 
 class BalanceFormat
 {
+    /**
+     * Для фикса чисел с плавающей точкой
+     * https://bio-gram.myjetbrains.com/youtrack/issue/BG-4223
+     * https://bio-gram.myjetbrains.com/youtrack/issue/BG-4976
+     */
+    const CORRECTION_FLOAT_VALUE = 0.0000000001;
+
     const PRECISIONS_MAP = [
         self::CODE_USD => 2,
         self::CODE_RUB => 2,
@@ -58,13 +65,9 @@ class BalanceFormat
      */
     static public function toNative(int $isoBalance, string $currency = self::CODE_USD) : float
     {
-        if (!function_exists('bcdiv')) {
-            throw new \LogicException(sprintf('The %s class requires the BCMath extension.', __CLASS__));
-        }
-
         $precision = self::PRECISIONS_MAP[$currency] ?? self::PRECISIONS_MAP[self::CODE_USD];
 
-        return bcdiv($isoBalance, pow(10, $precision), $precision);
+        return round($isoBalance / pow(10, $precision), $precision);
     }
 
     /**
@@ -75,12 +78,10 @@ class BalanceFormat
      */
     static function toISO(float $balance, string $currency = self::CODE_USD) : int
     {
-        if (!function_exists('bcmul')) {
-            throw new \LogicException(sprintf('The %s class requires the BCMath extension.', __CLASS__));
-        }
-
         $precision = self::PRECISIONS_MAP[$currency] ?? self::PRECISIONS_MAP[self::CODE_USD];
 
-        return bcmul($balance, pow(10, $precision), $precision);
+        return (int) (
+            (self::CORRECTION_FLOAT_VALUE + $balance) * pow(10, $precision)
+        );
     }
 }
