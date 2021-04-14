@@ -44,7 +44,7 @@ class JsonResponseBuilder
     {
         $this->body = [];
         $this->fractal = $fractal;
-        $this->response = new JsonResponse();
+        $this->response = (new JsonResponse())->setEncodingOptions(JSON_INVALID_UTF8_IGNORE);
     }
 
     public function setRequestStack(RequestStack $requestStack)
