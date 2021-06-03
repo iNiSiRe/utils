@@ -2,10 +2,12 @@
 
 namespace PrivateDev\Utils\Controller;
 
+use Exception;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use PrivateDev\Utils\Builder\FilterQueryBuilder;
 use PrivateDev\Utils\Builder\OrderQueryBuilder;
+use PrivateDev\Utils\ORM\Blending\BlenderInterface;
 use PrivateDev\Utils\Builder\PaginationQueryBuilder;
 use PrivateDev\Utils\Filter as Filter;
 use PrivateDev\Utils\Filter\Form\PaginationType;
@@ -20,7 +22,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 abstract class CRUDLController extends CRUDController
 {
@@ -138,12 +139,22 @@ abstract class CRUDLController extends CRUDController
     }
 
     /**
-     * @param Request                        $request
+     * @return BlenderInterface|null
+     */
+    protected function getDoctrineBlender()
+    {
+        return null;
+    }
+
+    /**
+     * @param Request        $request
      * @param QueryInterface $filter
-     * @param Pagination                     $pagination
-     * @param QueryInterface  $order
+     * @param Pagination     $pagination
+     * @param QueryInterface $order
      *
      * @return JsonResponse
+     *
+     * @throws Exception
      */
     protected function doList(Request $request, QueryInterface $filter, Pagination $pagination, QueryInterface $order)
     {
@@ -188,6 +199,12 @@ abstract class CRUDLController extends CRUDController
                 $responseBuilder->setHeader(self::PAGINATION_TOTAL_SIZE, $paginationBuilder->getTotalSize());
             }
 
+            // Blending the ORM and MongoDB ODM
+            $blender = $this->getDoctrineBlender();
+            if ($blender) {
+                $blender->blend($entities);
+            }
+
             $responseBuilder->setTransformableCollection($entities, $this->createEntityTransformerForAction(self::ACTION_LIST));
 
             $response = $this->applyCacheOptions($responseBuilder->build());
@@ -208,6 +225,8 @@ abstract class CRUDLController extends CRUDController
      * @param Request $request
      *
      * @return JsonResponse
+     *
+     * @throws Exception
      */
     public function listAction(Request $request)
     {
