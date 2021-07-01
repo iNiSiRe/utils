@@ -3,6 +3,7 @@
 namespace PrivateDev\Utils\Form\Transformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 
 class BooleanTransformer implements DataTransformerInterface
 {
@@ -25,6 +26,6 @@ class BooleanTransformer implements DataTransformerInterface
             return false;
         }
 
-        return null;
+        throw new TransformationFailedException();
     }
 }
