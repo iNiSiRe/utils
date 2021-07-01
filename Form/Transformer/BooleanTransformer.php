@@ -26,6 +26,6 @@ class BooleanTransformer implements DataTransformerInterface
             return false;
         }
 
-        throw new TransformationFailedException();
+        return null;
     }
 }
