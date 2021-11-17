@@ -34,7 +34,7 @@ class Translation
      *
      * @Property()
      *
-     * @ORM\Column(name="translation", type="json_array")
+     * @ORM\Column(name="translation", type="json")
     */
     private $translation;
 
