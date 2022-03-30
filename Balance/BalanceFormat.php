@@ -22,6 +22,7 @@ class BalanceFormat
         self::CODE_INR       => 2,
         self::CODE_BRL       => 2,
         self::CODE_TRY       => 2,
+        self::CODE_PHP       => 2,
         self::CODE_VND       => 0,
         self::CODE_JPY       => 0,
 
@@ -36,6 +37,7 @@ class BalanceFormat
         self::CODE_FAKE_INR  => 2,
         self::CODE_FAKE_BRL  => 2,
         self::CODE_FAKE_TRY  => 2,
+        self::CODE_FAKE_PHP  => 2,
         self::CODE_FAKE_VND  => 0,
         self::CODE_FAKE_JPY  => 0,
 
@@ -70,6 +72,7 @@ class BalanceFormat
     const CODE_BRL = 'BRL';
     const CODE_TRY = 'TRY';
     const CODE_JPY = 'JPY';
+    const CODE_PHP = 'PHP';
 
     // Crypto
     const CODE_BTC = 'BTC';
@@ -97,6 +100,8 @@ class BalanceFormat
     const CODE_FAKE_VND = 'fa318a996f36593f0c8ca67074c00c16';
     const CODE_FAKE_BRL = '03b097d0aa464130e0a761c034e435db';
     const CODE_FAKE_TRY = 'e74ad5e36bdb74c1267722beb8c3fb6a';
+    const CODE_FAKE_PHP = '5ab035441699124787ffbadf3986c8e7';
+
     const CODE_FAKE_BTC = 'e589c717ba28f448b2583220bc68436b';
     const CODE_FAKE_BCH = '35b52853e090101fd85226dd70cf804d';
     const CODE_FAKE_TRX = 'c1c61cd37fb9ac2824cb0c020725a2ed';
