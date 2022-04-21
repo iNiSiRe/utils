@@ -25,7 +25,7 @@ class CollectionType extends BaseCollectionType
                 return;
             }
 
-            if (is_string($data)) {
+            if (empty($data)) {
                 $event->setData([]);
             }
 
