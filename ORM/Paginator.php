@@ -2,9 +2,12 @@
 
 namespace PrivateDev\Utils\ORM;
 
+use Traversable;
+use ArrayIterator;
+use IteratorAggregate;
 use Doctrine\ORM\QueryBuilder;
 
-class Paginator implements \IteratorAggregate
+class Paginator implements IteratorAggregate
 {
     /**
      * @var QueryBuilder
@@ -34,7 +37,7 @@ class Paginator implements \IteratorAggregate
     /**
      * {@inheritdoc}
      */
-    public function getIterator()
+    public function getIterator() : Traversable
     {
         $alias = $this->builder->getRootAliases()[0];
         $ids = (clone $this->builder)
@@ -45,10 +48,10 @@ class Paginator implements \IteratorAggregate
 
         // don't do this for an empty id array
         if (count($ids) == 0) {
-            return new \ArrayIterator([]);
+            return new ArrayIterator([]);
         }
 
-        return new \ArrayIterator(
+        return new ArrayIterator(
             (clone $this->builder)
                 ->resetDQLPart('where')
                 ->where($alias . '.id IN (:ids)')

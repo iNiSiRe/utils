@@ -2,6 +2,8 @@
 
 namespace PrivateDev\Utils\Fractal;
 
+use League\Fractal\Resource\Item;
+use League\Fractal\Resource\Collection;
 use League\Fractal\TransformerAbstract as BaseTransformerAbstract;
 
 abstract class TransformerAbstract extends BaseTransformerAbstract
@@ -23,9 +25,9 @@ abstract class TransformerAbstract extends BaseTransformerAbstract
      * @param TransformerAbstract $transformer
      * @param string              $resourceKey
      *
-     * @return \League\Fractal\Resource\Item
+     * @return Item
      */
-    protected function item($data, $transformer, $resourceKey = null)
+    protected function item($data, $transformer, $resourceKey = null) : Item
     {
         $resourceKey = $resourceKey === null
             ? $transformer->getResourceKey()
@@ -39,9 +41,9 @@ abstract class TransformerAbstract extends BaseTransformerAbstract
      * @param TransformerAbstract $transformer
      * @param null                $resourceKey
      *
-     * @return \League\Fractal\Resource\Collection
+     * @return Collection
      */
-    protected function collection($data, $transformer, $resourceKey = null)
+    protected function collection($data, $transformer, $resourceKey = null) : Collection
     {
         $resourceKey = $resourceKey === null
             ? $transformer->getResourceKey()

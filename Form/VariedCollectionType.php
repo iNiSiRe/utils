@@ -29,12 +29,12 @@ class VariedCollectionType extends CollectionType
         }
 
         $resizeListener = new VariedTypeResizeFormListener(
+            $options['entry_type_callback'],
             $options['entry_type'],
             $options['entry_options'],
             $options['allow_add'],
             $options['allow_delete'],
-            $options['delete_empty'],
-            $options['entry_type_callback']
+            $options['delete_empty']
         );
 
         $builder->addEventSubscriber($resizeListener);

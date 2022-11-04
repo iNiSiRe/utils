@@ -10,17 +10,7 @@ class VariedTypeResizeFormListener extends ResizeFormListener
 {
     private $closure;
 
-    /**
-     * VariedTypeResizeFormListener constructor.
-     *
-     * @param       $type
-     * @param array $options
-     * @param bool  $allowAdd
-     * @param bool  $allowDelete
-     * @param bool  $deleteEmpty
-     * @param       $closure
-     */
-    public function __construct($type, array $options = [], $allowAdd = false, $allowDelete = false, $deleteEmpty = false, $closure)
+    public function __construct($closure, $type, array $options = [], $allowAdd = false, $allowDelete = false, $deleteEmpty = false)
     {
         parent::__construct($type, $options, $allowAdd, $allowDelete, $deleteEmpty);
 
