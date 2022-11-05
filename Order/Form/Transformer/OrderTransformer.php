@@ -11,7 +11,7 @@ class OrderTransformer implements DataTransformerInterface
      */
     public function transform($value)
     {
-        return !is_null($value) ? strtoupper($value) : $value;
+        return !is_null($value) ? strtoupper($value) : '';
     }
 
     /**
@@ -19,6 +19,6 @@ class OrderTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
-        return !is_null($value) ? strtoupper($value) : $value;
+        return !is_null($value) ? strtoupper($value) : '';
     }
 }
