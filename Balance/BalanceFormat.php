@@ -16,6 +16,8 @@ class BalanceFormat
         self::CODE_RUB       => 2,
         self::CODE_EUR       => 2,
         self::CODE_UAH       => 2,
+        self::CODE_AUD       => 2,
+        self::CODE_NOK       => 2,
         self::CODE_KZT       => 2,
         self::CODE_IDR       => 2,
         self::CODE_THB       => 2,
@@ -64,6 +66,8 @@ class BalanceFormat
     const CODE_RUB = 'RUB';
     const CODE_EUR = 'EUR';
     const CODE_UAH = 'UAH';
+    const CODE_AUD = 'AUD';
+    const CODE_NOK = 'NOK';
     const CODE_KZT = 'KZT';
     const CODE_IDR = 'IDR';
     const CODE_THB = 'THB';
