@@ -2,52 +2,27 @@
 
 namespace PrivateDev\Utils\Entity;
 
-use Doctrine\ORM\Mapping\PrePersist;
-use Doctrine\ORM\Mapping\PreUpdate;
+use Exception;
+use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Class TranslationEntityTrait
- *
- * @package Utils\Entity
- */
 trait TranslationEntityTrait
 {
-    /**
-     * @var Translation
-     *
-     * @ORM\OneToOne(targetEntity="\PrivateDev\Utils\Entity\Translation", cascade={"all"}, fetch="EAGER")
-     */
-    private $translation;
+    #[ORM\OneToOne(targetEntity: Translation::class, cascade: ['all'], fetch: 'EAGER')]
+    private ?Translation $translation = null;
 
-    /**
-     * @param mixed $translation
-     * @return static
-     */
-    public function setTranslation(Translation $translation)
+    public function setTranslation(Translation $translation) : static
     {
         $this->translation = $translation;
+
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getTranslation()
+    public function getTranslation() : ?Translation
     {
         return $this->translation;
     }
 
-    /**
-     * Set translation for field
-     *
-     * @param string $field
-     * @param $value
-     * @param string $language
-     * @return static
-     *
-     *
-     */
-    protected function setTranslationForField(string $field, $value, string $language)
+    protected function setTranslationForField(string $field, $value, string $language) : static
     {
         if (!$this->translation) {
             $this->translation = (new Translation())
@@ -59,18 +34,11 @@ trait TranslationEntityTrait
         return $this;
     }
 
-    /**
-     * Get translation for field
-     *
-     * @param $field
-     * @param $language
-     * @return string
-     */
-    protected function getTranslationForField(string $field, string $language)
+    protected function getTranslationForField(string $field, string $language) : ?string
     {
         try {
-            $value = $this->translation ? $this->translation->getFieldTranslation($field, $language) : null;
-        } catch (\Exception $e) {
+            $value = $this->translation?->getFieldTranslation($field, $language);
+        } catch (Exception $e) {
             $value = null;
         }
 

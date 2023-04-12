@@ -2,39 +2,20 @@
 
 namespace PrivateDev\Utils\Entity;
 
-use Doctrine\ORM\Mapping\PrePersist;
-use Doctrine\ORM\Mapping\PreUpdate;
+use DateTime;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Class TimestampEntityTrait
- *
  * Notice: Don't forget add "@ORM\HasLifecycleCallbacks" to entity class
- *
- * @package Utils\Entity
  */
 trait TimestampEntityTrait
 {
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime")
-     */
-    private $createdAt;
+    #[ORM\Column(name: 'created_at', type: 'datetime')]
+    private DateTime $createdAt;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="updated_at", type="datetime")
-     */
-    private $updatedAt;
+    #[ORM\Column(name: 'updated_at', type: 'datetime')]
+    private DateTime $updatedAt;
 
-    /**
-     * Set createdAt
-     *
-     * @param \DateTime $createdAt
-     *
-     * @return self
-     */
     public function setCreatedAt($createdAt)
     {
         $this->createdAt = $createdAt;
@@ -42,23 +23,11 @@ trait TimestampEntityTrait
         return $this;
     }
 
-    /**
-     * Get createdAt
-     *
-     * @return \DateTime
-     */
     public function getCreatedAt()
     {
         return $this->createdAt;
     }
 
-    /**
-     * Set updatedAt
-     *
-     * @param \DateTime $updatedAt
-     *
-     * @return self
-     */
     public function setUpdatedAt($updatedAt)
     {
         $this->updatedAt = $updatedAt;
@@ -66,30 +35,21 @@ trait TimestampEntityTrait
         return $this;
     }
 
-    /**
-     * Get updatedAt
-     *
-     * @return \DateTime
-     */
     public function getUpdatedAt()
     {
         return $this->updatedAt;
     }
 
-    /**
-     * @PrePersist
-     */
+    #[ORM\PrePersist]
     public function timestampCreatedAt()
     {
-        $this->setCreatedAt(new \DateTime());
-        $this->setUpdatedAt(new \DateTime());
+        $this->setCreatedAt(new DateTime());
+        $this->setUpdatedAt(new DateTime());
     }
 
-    /**
-     * @PreUpdate
-     */
+    #[ORM\PreUpdate]
     public function timestampUpdatedAt()
     {
-        $this->setUpdatedAt(new \DateTime());
+        $this->setUpdatedAt(new DateTime());
     }
 }

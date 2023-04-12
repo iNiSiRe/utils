@@ -15,9 +15,8 @@ trait EnableEntityTrait
 {
     /**
      * @var boolean
-     *
-     * @ORM\Column(name="enabled", type="boolean", nullable=true)
      */
+    #[ORM\Column(name: 'enabled', type: 'boolean', nullable: true)]
     private $enabled;
 
     /**

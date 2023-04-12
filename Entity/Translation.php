@@ -3,48 +3,32 @@
 namespace PrivateDev\Utils\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use PrivateDev\Utils\Entity\TimestampEntityTrait;
-use Swagger\Annotations\Definition;
-use Swagger\Annotations\Property;
 
-/**
- * @Definition()
- *
- * @ORM\Table(name="translations")
- * @ORM\Entity()
- * @ORM\HasLifecycleCallbacks()
- */
+#[ORM\Table(name: 'translations')]
+#[ORM\Entity]
+#[ORM\HasLifecycleCallbacks]
 class Translation
 {
     use TimestampEntityTrait;
 
     /**
      * @var int
-     *
-     * @Property()
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     /**
      * @var []
-     *
-     * @Property()
-     *
-     * @ORM\Column(name="translation", type="json")
-    */
+     */
+    #[ORM\Column(name: 'translation', type: 'json')]
     private $translation;
 
     /**
      * @var string
-     *
-     * @Property()
-     *
-     * @ORM\Column(name="entity_class", type="string")
      */
+    #[ORM\Column(name: 'entity_class', type: 'string')]
     private $entityClass;
 
 
