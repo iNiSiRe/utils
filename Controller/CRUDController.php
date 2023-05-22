@@ -11,7 +11,6 @@ use PrivateDev\Utils\Json\TransformableJsonResponseBuilder;
 use PrivateDev\Utils\Permission\Permissions;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -107,9 +106,7 @@ abstract class CRUDController extends AbstractController
     {
         $roles = $this->getRoles();
 
-        return isset($roles[$action])
-            ? $roles[$action]
-            : null;
+        return $roles[$action] ?? null;
     }
 
     /**
@@ -117,7 +114,7 @@ abstract class CRUDController extends AbstractController
      */
     protected function save($entity)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->getEntityManager();
         $em->persist($entity);
         $em->flush();
     }
@@ -308,7 +305,7 @@ abstract class CRUDController extends AbstractController
     {
         $this->postEntityLoadCheckAccess(self::ACTION_DELETE, $entity);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->getEntityManager();
         $em->remove($entity);
         $em->flush();
 
