@@ -3,6 +3,7 @@
 namespace PrivateDev\Utils\Controller;
 
 use Doctrine\ORM\EntityRepository;
+use PrivateDev\Utils\Entity\EntityInterface;
 use PrivateDev\Utils\Entity\TranslatableEntityInterface;
 use PrivateDev\Utils\Entity\Translation;
 use PrivateDev\Utils\Form\FormErrorAdapter;
@@ -171,7 +172,7 @@ abstract class CRUDController extends AbstractController
                 $entity->setTranslation($translation);
             }
 
-            if ($entity->getId() == null) {
+            if (($entity instanceof EntityInterface && !$entity->hasId()) || $entity->getId() === null) {
                 $payload = $this->onCreateSuccess($entity);
             } else {
                 $payload = $this->onUpdateSuccess($entity);
