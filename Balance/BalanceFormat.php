@@ -11,6 +11,9 @@ class BalanceFormat
      */
     const CORRECTION_FLOAT_VALUE = 0.0000000001;
 
+    /**
+     * @deprecated use VO\Currency instead
+     */
     const PRECISIONS_MAP = [
         self::CODE_USD       => 2,
         self::CODE_RUB       => 2,
