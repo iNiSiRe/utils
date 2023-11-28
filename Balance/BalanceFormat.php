@@ -8,8 +8,9 @@ class BalanceFormat
      * Для фикса чисел с плавающей точкой
      * https://bio-gram.myjetbrains.com/youtrack/issue/BG-4223
      * https://bio-gram.myjetbrains.com/youtrack/issue/BG-4976
+     * https://bio-gram.myjetbrains.com/youtrack/issue/BG-12236
      */
-    const CORRECTION_FLOAT_VALUE = 0.0000000001;
+    const CORRECTION_FLOAT_VALUE = 0.000000001;
 
     /**
      * @deprecated use VO\Currency instead
