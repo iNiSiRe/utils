@@ -110,9 +110,27 @@ class FilterQueryBuilder extends AbstractQueryBuilder
 
                         $operand2 = "{$alias}_{$this->createPlaceholder($key)}_value";
 
-                        $this->builder
-                            ->andWhere("{$operand1} {$operator} (:{$operand2})")
-                            ->setParameter($operand2, $value->getValue());
+                        if (in_array(null, $value->getValue(), true)) {
+                            if ($value->getOperator() === FilterData::OPERATOR_EQUAL) {
+                                $this
+                                    ->builder
+                                    ->andWhere("{$operand1} {$operator} (:{$operand2}) OR {$operand1} IS NULL")
+                                    ->setParameter($operand2, array_filter($value->getValue(), function ($v) {
+                                        return $v !== null;
+                                    }));
+                            } elseif ($value->getOperator() === FilterData::OPERATOR_NOT_EQUAL) {
+                                $this
+                                    ->builder
+                                    ->andWhere("{$operand1} {$operator} (:{$operand2}) AND {$operand1} IS NOT NULL")
+                                    ->setParameter($operand2, array_filter($value->getValue(), function ($v) {
+                                        return $v !== null;
+                                    }));
+                            }
+                        } else {
+                            $this->builder
+                                ->andWhere("{$operand1} {$operator} (:{$operand2})")
+                                ->setParameter($operand2, $value->getValue());
+                        }
                     } else {
                         switch ($value->getOperator()) {
                             case FilterData::OPERATOR_EQUAL:
@@ -149,12 +167,12 @@ class FilterQueryBuilder extends AbstractQueryBuilder
 
             // array
             case (is_array($value)):
-            {
-                $this->builder
-                    ->andWhere(sprintf('%1$s.%2$s IN (:%1$s_%3$s_value)', $alias, $key, $this->createPlaceholder($key)))
-                    ->setParameter(sprintf('%s_%s_value', $alias, $this->createPlaceholder($key)), $value);
-            }
-            break;
+                {
+                    $this->builder
+                        ->andWhere(sprintf('%1$s.%2$s IN (:%1$s_%3$s_value)', $alias, $key, $this->createPlaceholder($key)))
+                        ->setParameter(sprintf('%s_%s_value', $alias, $this->createPlaceholder($key)), $value);
+                }
+                break;
         }
     }
 }
