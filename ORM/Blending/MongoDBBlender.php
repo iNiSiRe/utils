@@ -3,13 +3,11 @@
 namespace PrivateDev\Utils\ORM\Blending;
 
 use ReflectionClass;
-use PaymentBundle\Entity\Transaction;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\MongoDBException;
 use PrivateDev\Utils\ORM\Annotations\Blendable;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
-use Binarium\Core\Domain\Payment\Entity\TransactionExtra;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 class MongoDBBlender implements BlenderInterface
@@ -80,7 +78,6 @@ class MongoDBBlender implements BlenderInterface
                 ->getQuery()
                 ->execute();
 
-            /** @var TransactionExtra $document */
             foreach ($documents as $document) {
 
                 $this
@@ -106,7 +103,7 @@ class MongoDBBlender implements BlenderInterface
     {
         if (!isset($this->metadata[$className])) {
 
-            $reflectionClass = new ReflectionClass(Transaction::class);
+            $reflectionClass = new ReflectionClass($className);
             $reader = new AnnotationReader();
 
             foreach ($reflectionClass->getProperties() as $property) {
