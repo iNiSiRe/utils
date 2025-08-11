@@ -2,6 +2,8 @@
 
 namespace PrivateDev\Utils\ORM;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Query\Parameter;
 use Traversable;
 use ArrayIterator;
 use IteratorAggregate;
@@ -57,7 +59,9 @@ class Paginator implements IteratorAggregate
                 ->where($alias . '.id IN (:ids)')
                 ->setFirstResult(null)
                 ->setMaxResults(null)
-                ->setParameters(['ids' => $ids])
+                ->setParameters(new ArrayCollection([
+                    new Parameter('ids', $ids)
+                ]))
                 ->getQuery()
                 ->getResult()
         );
