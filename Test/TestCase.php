@@ -26,7 +26,7 @@ class TestCase extends WebTestCase
     /**
      * Set up
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->client = self::createClient();
         $this->container = $this->client->getContainer();
